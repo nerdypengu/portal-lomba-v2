@@ -17,10 +17,14 @@ steps:
     versionSpec: '18.x'
 
 - script: |
+    rd /s /q "C:\agents\_work\1\s\client\node_modules"
+  displayName: 'Remove client node_modules manually'
+
+- script: |
     echo "Installing Client Dependencies"
-    npm install --prefix client
+    npm ci install --prefix client
     echo "Installing Server Dependencies"
-    npm install --prefix server
+    npm ci install --prefix server
   displayName: "Install Dependencies"
 
 - task: PowerShell@2
