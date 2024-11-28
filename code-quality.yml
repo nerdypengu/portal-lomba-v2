@@ -16,10 +16,14 @@ steps:
   inputs:
     versionSpec: '18.x'
 
-- script: |
-    echo "Removing client node_modules directory..."
-    rd /s /q "C:\agents\_work\1\s\client\node_modules"
+- task: PowerShell@2
   displayName: 'Remove client node_modules manually'
+  inputs:
+    targetType: 'inline'
+    script: |
+      echo "Removing client node_modules directory..."
+      Remove-Item -Path "C:\agents\_work\1\s\client\node_modules" -Recurse -Force
+
 
 - script: |
     echo "Installing Client Dependencies"
