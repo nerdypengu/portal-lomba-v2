@@ -61,14 +61,26 @@ steps:
 #    projectName: ''
 
 - script: |
-    echo "Running ESLint for client..."
-    npx eslint client --config client/eslint.config.js --fix --format json -o client/eslint-report.json
-  displayName: 'Run ESLint for Client'
+    echo "Checking for existing ESLint config file..."
+    if (Test-Path "eslint.config.js") {
+      echo "ESLint config file exists."
+    } else {
+      echo "No ESLint config file found. Creating global ESLint config file..."
+      echo 'module.exports = {
+        overrides: [
+          {
+            files: ["client/**/*"],
+            configFile: "./client/eslint.config.js"
+          },
+        ]
+      };' > eslint.config.js
+    }
+  displayName: 'Check and Create ESLint Config'
 
 - script: |
-    echo "Running ESLint for server..."
-    npx eslint server --config server/eslint.config.js --fix --format json -o server/eslint-report.json
-  displayName: 'Run ESLint for Server'
+    echo "Running ESLint for the entire project..."
+    npx eslint . --fix --format json -o eslint-report.json
+  displayName: 'Run ESLint'
 
 # Publish report
 - task: PublishBuildArtifacts@1
