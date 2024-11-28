@@ -18,10 +18,15 @@ steps:
 
 # Install dependencies
 - script: |
-    echo Installing client dependencies...
-    npm install --prefix client
-    echo Installing server dependencies...
-    npm install --prefix server
+    npm install -g yarn
+    yarn --version
+  displayName: Install Yarn
+
+- script: |
+    echo Installing client dependencies with Yarn...
+    yarn --cwd client install
+    echo Installing server dependencies with Yarn...
+    yarn --cwd server install
   displayName: Install Dependencies
 
 - task: PowerShell@2
