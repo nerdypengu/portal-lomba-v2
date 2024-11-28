@@ -23,10 +23,8 @@ steps:
   displayName: Install Yarn
 
 - script: |
-    echo Installing client dependencies with Yarn...
-    yarn --cwd client install
-    echo Installing server dependencies with Yarn...
-    yarn --cwd server install
+    echo Installing all dependencies with Yarn...
+    yarn install
   displayName: Install Dependencies
 
 - task: PowerShell@2
@@ -38,13 +36,13 @@ steps:
           New-Item -ItemType Directory -Path "$(Pipeline.Workspace)\.npm"
       }
 
-# Cache Node.js dependencies untuk mempercepat build selanjutnya
+# Cache Yarn dependencies
 - task: CacheBeta@2
   inputs:
-    key: 'npm | "$(Agent.OS)" | $(Build.SourcesDirectory)/package-lock.json'  # Cache berdasarkan package-lock.json
-    path: $(Pipeline.Workspace)/.npm
-    cacheHitVar: NpmCacheRestored
-  displayName: 'Cache Node.js Dependencies'
+    key: 'yarn | "$(Agent.OS)" | $(Build.SourcesDirectory)/yarn.lock'
+    path: ~/.cache/yarn
+    cacheHitVar: YarnCacheRestored
+  displayName: 'Cache Yarn Dependencies'
 
 # Dependency check dengan OWASP
 #- task: dependency-check-build-task@6
@@ -60,7 +58,7 @@ steps:
 
 # Linting dengan fix
 - script: |
-    npx eslint . --fix --format json -o eslint-report.json
+    yarn eslint . --fix --format json -o eslint-report.json
   displayName: 'Run ESLint with Fix and Report'
 
 # Publish report
