@@ -16,10 +16,14 @@ steps:
   inputs:
     versionSpec: '18.x'
 
-# Install dependencies
+# Install Dependencies
 - script: |
+    echo "Menghapus folder node_modules dan file package-lock.json..."
+    rm -rf node_modules package-lock.json
+
+    echo "Menginstal dependencies dengan npm install..."
     npm install
-  displayName: Install Dependencies
+  displayName: "Clean and Install Dependencies"
 
 - task: PowerShell@2
   displayName: 'Ensure Cache Directory Exists'
