@@ -14,7 +14,7 @@ steps:
 - task: NodeTool@0
   displayName: 'Install Node.js'
   inputs:
-    versionSpec: '22.10.0'
+    versionSpec: '18.x'
 
 # Install dependencies
 - script: |
