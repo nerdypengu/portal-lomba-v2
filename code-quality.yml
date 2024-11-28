@@ -61,9 +61,14 @@ steps:
 #    projectName: ''
 
 - script: |
-    echo "Running ESLint for client and server..."
-    npx eslint client server --fix --format json -o eslint-report.json
-  displayName: 'Run ESLint for Client and Server'
+    echo "Running ESLint for client..."
+    npx eslint client --fix --format json -o client/eslint-report.json
+  displayName: 'Run ESLint for Client'
+
+- script: |
+    echo "Running ESLint for server..."
+    npx eslint server --fix --format json -o server/eslint-report.json
+  displayName: 'Run ESLint for Server'
 
 # Publish report
 - task: PublishBuildArtifacts@1
