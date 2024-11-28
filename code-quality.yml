@@ -18,8 +18,11 @@ steps:
 
 # Install dependencies
 - script: |
-    npm install
-  displayName: 'Install Dependencies'
+    echo Installing client dependencies...
+    npm install --prefix client
+    echo Installing server dependencies...
+    npm install --prefix server
+  displayName: Install Dependencies
 
 - task: PowerShell@2
   displayName: 'Ensure Cache Directory Exists'
