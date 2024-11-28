@@ -14,17 +14,13 @@ steps:
 - task: NodeTool@0
   displayName: 'Install Node.js'
   inputs:
-    versionSpec: '18.x'
+    versionSpec: '16.x'
 
 # Clean and Install Dependencies
 - script: |
-    echo "Menghapus folder node_modules dan file package-lock.json..."
-    if exist node_modules rmdir /s /q node_modules
-    if exist package-lock.json del /f /q package-lock.json
-
-    echo "Menginstal dependencies dengan npm install..."
-    npm install
-  displayName: "Clean and Install Dependencies (Windows)"
+    npm install --prefix client
+    npm install --prefix server
+  displayName: 'Install Dependencies'
 
 - task: PowerShell@2
   displayName: 'Ensure Cache Directory Exists'
