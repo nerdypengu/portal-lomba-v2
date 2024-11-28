@@ -60,24 +60,31 @@ steps:
 #    uploadSARIFReports: true
 #    projectName: ''
 
-- task: Bash@3
-  displayName: 'Check for ESLint Config File in Root'
-  inputs:
-    targetType: 'inline'
-    script: |
-      if [ ! -f "$(Build.SourcesDirectory)/eslint.config.js" ]; then
-        echo "No ESLint config file found. Creating global ESLint config file..."
-        echo "module.exports = { 
-          overrides: [
-            {
-              files: ['client/**/*'],
-              configFile: './client/eslint.config.js'
-            }
-          ]
-        }" > $(Build.SourcesDirectory)/eslint.config.js
-      else
-        echo "ESLint config file already exists."
-      fi
+- script: |
+    echo "Checking for existing ESLint config file..."
+    if (Test-Path "eslint.config.js") {
+      echo "ESLint config file exists."
+    } else {
+      echo "No ESLint config file found."
+    }
+  displayName: 'Check for Existing ESLint Config'
+
+- script: |
+    echo "Creating ESLint config file..."
+    echo 'module.exports = {
+      overrides: [
+        {
+          files: ["client/**/*"],
+          configFile: "./client/eslint.config.js"
+        },
+        {
+          files: ["server/**/*"],
+          configFile: "./server/eslint.config.js"
+        }
+      ]
+    };' > eslint.config.js
+  displayName: 'Create ESLint Config File'
+  condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'refs/heads/main'), not(contains(variables['Build.ArtifactStagingDirectory'], 'eslint.config.js')))
 
 - script: |
     echo "Running ESLint for the entire project..."
