@@ -23,8 +23,10 @@ steps:
   displayName: Install Yarn
 
 - script: |
-    echo Installing all dependencies with Yarn...
-    yarn install
+    echo Installing client dependencies with Yarn...
+    yarn --cwd client install
+    echo Installing server dependencies with Yarn...
+    yarn --cwd server install
   displayName: Install Dependencies
 
 - task: PowerShell@2
