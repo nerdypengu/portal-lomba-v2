@@ -17,6 +17,7 @@ steps:
     versionSpec: '18.x'
 
 - script: |
+    echo "Removing client node_modules directory..."
     rd /s /q "C:\agents\_work\1\s\client\node_modules"
   displayName: 'Remove client node_modules manually'
 
