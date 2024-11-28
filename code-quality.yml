@@ -16,11 +16,12 @@ steps:
   inputs:
     versionSpec: '16.x'
 
-# Clean and Install Dependencies
 - script: |
+    echo "Installing Client Dependencies"
     npm install --prefix client
+    echo "Installing Server Dependencies"
     npm install --prefix server
-  displayName: 'Install Dependencies'
+  displayName: "Install Dependencies"
 
 - task: PowerShell@2
   displayName: 'Ensure Cache Directory Exists'
