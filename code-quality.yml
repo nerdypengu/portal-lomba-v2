@@ -60,10 +60,10 @@ steps:
 #    uploadSARIFReports: true
 #    projectName: ''
 
-# Linting dengan fix
 - script: |
-    npx eslint . --fix --format json -o eslint-report.json
-  displayName: 'Run ESLint with Fix and Report'
+    echo "Running ESLint for client and server..."
+    npx eslint client server --fix --format json -o eslint-report.json
+  displayName: 'Run ESLint for Client and Server'
 
 # Publish report
 - task: PublishBuildArtifacts@1
