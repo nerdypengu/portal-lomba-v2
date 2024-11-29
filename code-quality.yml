@@ -60,6 +60,7 @@ steps:
 #    uploadSARIFReports: true
 #    projectName: ''
 
+#Run ESlint
 - script: |
     npx eslint --config client/eslint.config.js client --fix --format json -o eslint-report.json
   displayName: 'Run ESLint'
