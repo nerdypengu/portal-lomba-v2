@@ -76,19 +76,14 @@ steps:
       }
 
 # Create ESLint config file if it doesn't exist
-- script: |
-    if ($env:ESLINT_CONFIG_NOT_FOUND -eq "true") {
-      echo "Creating ESLint config file..."
-      echo 'module.exports = {
-        overrides: [
-          {
-            files: ["client/**/*"],
-            configFile: "./client/eslint.config.js"
-          }
-        ]
-      };' > eslint.config.js
-    }
+- task: PowerShell@2
   displayName: 'Create ESLint Config File'
+  inputs:
+    targetType: 'inline'
+    script: |
+      Write-Host "Creating ESLint config file..."
+      $eslintConfig = @"module.exports = {overrides: [{files: ["client/**/*"],configFile: "./client/eslint.config.js"}]};"@
+      Set-Content -Path "$(Build.SourcesDirectory)/eslint.config.js" -Value $eslintConfig
   condition: eq(variables['ESLINT_CONFIG_NOT_FOUND'], 'true')
 
 - script: |
