@@ -60,40 +60,9 @@ steps:
 #    uploadSARIFReports: true
 #    projectName: ''
 
-# Check for existing ESLint config
-- task: PowerShell@2
-  displayName: 'Check for Existing ESLint Config'
-  inputs:
-    targetType: 'inline'
-    script: |
-      Write-Host "Checking for existing ESLint config file..."
-      if (-not (Test-Path "$(Build.SourcesDirectory)/eslint.config.js")) {
-        Write-Host "No ESLint config file found."
-        Write-Host "##vso[task.setvariable variable=ESLINT_CONFIG_NOT_FOUND;]true"
-      } else {
-        Write-Host "ESLint config file exists."
-        Write-Host "##vso[task.setvariable variable=ESLINT_CONFIG_NOT_FOUND;]false"
-      }
-
-# Create ESLint config file if it doesn't exist
-- task: PowerShell@2
-  displayName: 'Create ESLint Config File'
-  inputs:
-    targetType: 'inline'
-    script: |
-      Write-Host "Creating ESLint config file..."
-      $eslintConfig = 'module.exports = ['
-      $eslintConfig += '  {'
-      $eslintConfig += '    files: ["client/**/*"],'
-      $eslintConfig += '    extends: "./client/eslint.config.js"'
-      $eslintConfig += '  }'
-      $eslintConfig += '];'
-      Set-Content -Path "$(Build.SourcesDirectory)/eslint.config.js" -Value $eslintConfig
-  condition: eq(variables['ESLINT_CONFIG_NOT_FOUND'], 'true')
-
 - script: |
     echo "Running ESLint for the entire project..."
-    npx eslint . --fix --format json -o eslint-report.json
+    npx eslint --config client/eslint.config.js --fix --format json -o eslint-report.json
   displayName: 'Run ESLint'
 
 # Publish report
