@@ -66,24 +66,33 @@ steps:
     targetType: 'inline'
     script: |
       Write-Host "Checking for existing ESLint config file..."
-      if (Test-Path "eslint.config.js") {
-        Write-Host "ESLint config file exists."
-      } else {
+      if (-not (Test-Path "$(Build.SourcesDirectory)/eslint.config.js")) {
         Write-Host "No ESLint config file found."
+        $env:ESLINT_CONFIG_NOT_FOUND = "true"
+      } else {
+        Write-Host "ESLint config file exists."
+        $env:ESLINT_CONFIG_NOT_FOUND = "false"
       }
 
+# Create ESLint config file if it doesn't exist
 - script: |
-    echo "Creating ESLint config file..."
-    echo 'module.exports = {
-      overrides: [
-        {
-          files: ["client/**/*"],
-          configFile: "./client/eslint.config.js"
-        }
-      ]
-    };' > eslint.config.js
+    if ($env:ESLINT_CONFIG_NOT_FOUND -eq "true") {
+      echo "Creating ESLint config file..."
+      echo 'module.exports = {
+        overrides: [
+          {
+            files: ["client/**/*"],
+            configFile: "./client/eslint.config.js"
+          },
+          {
+            files: ["server/**/*"],
+            configFile: "./server/eslint.config.js"
+          }
+        ]
+      };' > eslint.config.js
+    }
   displayName: 'Create ESLint Config File'
-  condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'refs/heads/main'), not(contains(variables['Build.ArtifactStagingDirectory'], 'eslint.config.js')))
+  condition: eq(variables['ESLINT_CONFIG_NOT_FOUND'], 'true')
 
 - script: |
     echo "Running ESLint for the entire project..."
