@@ -1,0 +1,65 @@
+trigger: none
+
+pool:
+  name: Host
+
+variables:
+  dockerRegistryServiceConnection: '<YOUR-DOCKER-SERVICE-CONNECTION>'
+  containerRegistry: '<YOUR-REGISTRY-NAME>.azurecr.io'
+  imageNameFrontend: 'frontend'
+  imageNameBackend: 'backend'
+
+stages:
+- stage: BuildAndContainerize
+  displayName: Build and Containerize
+  jobs:
+  - job: BuildAndContainerizeJob
+    displayName: Build and Containerize Job
+    steps:
+    # Step 1: Checkout code
+    - task: Checkout@1
+      displayName: Checkout Code
+
+    # Step 2: Install Dependencies (Frontend and Backend)
+    - script: |
+        npm install --prefix client
+        npm install --prefix server
+      displayName: Install Dependencies
+
+    # Step 3: Build Frontend
+    - script: npm run build --prefix client
+      displayName: Build Frontend
+
+    # Step 4: Build Backend
+    - script: npm run build --prefix server
+      displayName: Build Backend
+
+    # Step 5: Dockerize Frontend
+    - task: Docker@2
+      displayName: Build Docker Image (Frontend)
+      inputs:
+        command: build
+        containerRegistry: $(dockerRegistryServiceConnection)
+        dockerfile: client/Dockerfile
+        tags: |
+          $(imageNameFrontend):$(Build.BuildId)
+
+    # Step 6: Dockerize Backend
+    - task: Docker@2
+      displayName: Build Docker Image (Backend)
+      inputs:
+        command: build
+        containerRegistry: $(dockerRegistryServiceConnection)
+        dockerfile: server/Dockerfile
+        tags: |
+          $(imageNameBackend):$(Build.BuildId)
+
+    # Step 7: Push Docker Images
+    - task: Docker@2
+      displayName: Push Docker Images
+      inputs:
+        command: push
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(containerRegistry)/$(imageNameFrontend):$(Build.BuildId)
+          $(containerRegistry)/$(imageNameBackend):$(Build.BuildId)
