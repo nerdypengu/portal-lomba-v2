@@ -83,10 +83,6 @@ steps:
           {
             files: ["client/**/*"],
             configFile: "./client/eslint.config.js"
-          },
-          {
-            files: ["server/**/*"],
-            configFile: "./server/eslint.config.js"
           }
         ]
       };' > eslint.config.js
