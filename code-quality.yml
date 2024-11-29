@@ -60,6 +60,7 @@ steps:
 #    uploadSARIFReports: true
 #    projectName: ''
 
+# Check for existing ESLint config
 - task: PowerShell@2
   displayName: 'Check for Existing ESLint Config'
   inputs:
@@ -68,10 +69,10 @@ steps:
       Write-Host "Checking for existing ESLint config file..."
       if (-not (Test-Path "$(Build.SourcesDirectory)/eslint.config.js")) {
         Write-Host "No ESLint config file found."
-        $env:ESLINT_CONFIG_NOT_FOUND = "true"
+        Write-Host "##vso[task.setvariable variable=ESLINT_CONFIG_NOT_FOUND;]true"
       } else {
         Write-Host "ESLint config file exists."
-        $env:ESLINT_CONFIG_NOT_FOUND = "false"
+        Write-Host "##vso[task.setvariable variable=ESLINT_CONFIG_NOT_FOUND;]false"
       }
 
 # Create ESLint config file if it doesn't exist
