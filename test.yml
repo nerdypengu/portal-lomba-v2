@@ -1,0 +1,45 @@
+trigger: none
+
+dependsOn:
+  - BuildAndContainerize
+
+pool:
+  name: Host
+
+stages:
+- stage: Testing
+  displayName: Run Tests
+  jobs:
+  - job: TestJob
+    displayName: Testing Job
+    steps:
+    # Step 1: Checkout code
+    - task: Checkout@1
+      displayName: Checkout Code
+
+    # Step 2: Install Dependencies
+    - script: |
+        npm install --prefix client --only=dev
+        npm install --prefix server --only=dev
+      displayName: Install Dependencies
+
+    # Step 3: Run Unit Tests (Frontend)
+    - script: npm test --prefix client
+      displayName: Run Frontend Unit Tests
+
+    # Step 4: Run Unit Tests (Backend)
+    - script: npm test --prefix server
+      displayName: Run Backend Unit Tests
+
+    # Step 5: Run Integration Tests (Backend)
+    - script: npm test:integration --prefix server
+      displayName: Run Backend Integration Tests
+
+    # Step 6: Publish Test Results
+    - task: PublishTestResults@2
+      displayName: Publish Test Results
+      inputs:
+        testResultsFiles: '**/test-results.xml'
+        testRunTitle: 'Test Results'
+
+    # Step 7: Fail Pipeline if Tests Fail (Handled automatically by Azure DevOps)
