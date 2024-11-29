@@ -1,0 +1,69 @@
+# azure-pipelines.yml
+pool:
+  name: Host
+
+trigger:
+  # branches:
+  #   include:
+  #     - main  
+
+variables:
+  dockerRegistryServiceConnection: 'DOCKER_SERVICE_CONNECTION_ID'  
+  containerRegistry: 'myregistry.azurecr.io'  
+  imageName: 'my-app'  
+  azureWebAppName: 'my-web-app'  
+  resourceGroup: 'my-resource-group'  
+
+stages:
+  - stage: Deploy
+    displayName: Deploy to Azure Web Apps
+    jobs:
+      - job: DeployJob
+        displayName: Deployment Job
+        steps:
+          # Step 1: Fetch Docker Image from Registry
+          - task: DockerInstaller@0
+            displayName: Install Docker
+          - script: |
+              echo "Pulling Docker image from registry..."
+              docker login $(containerRegistry) -u $(dockerRegistryUsername) -p $(dockerRegistryPassword)
+              docker pull $(containerRegistry)/$(imageName):latest
+            displayName: Fetch Docker Image
+
+          # Step 2: Deploy to Azure Web Apps
+          - task: AzureWebAppContainer@1
+            inputs:
+              azureSubscription: 'AZURE_SERVICE_CONNECTION_ID' 
+              appName: $(azureWebAppName)
+              resourceGroupName: $(resourceGroup)
+              imageName: $(containerRegistry)/$(imageName):latest
+              startupCommand: ''  
+
+          # Step 3: Run Smoke Test
+          - script: |
+              echo "Running smoke test..."
+              curl -f https://$(azureWebAppName).azurewebsites.net/health || exit 1
+            displayName: Smoke Test
+            continueOnError: true
+
+          # Step 4: Rollback if Smoke Test Fails
+          - task: AzureCLI@2
+            condition: failed()
+            inputs:
+              azureSubscription: 'AZURE_SERVICE_CONNECTION_ID'
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                echo "Rolling back to previous version..."
+                az webapp deployment container config \
+                  --name $(azureWebAppName) \
+                  --resource-group $(resourceGroup) \
+                  --enable-continuous-deployment false
+                # Update with rollback logic (e.g., redeploy older image)
+
+          # Step 5: Mark Pipeline as Failed if Rollback Occurs
+          - script: |
+              echo "Pipeline failed due to smoke test failure. Rollback executed."
+              exit 1
+            displayName: Mark Pipeline as Failed
+            condition: failed()
