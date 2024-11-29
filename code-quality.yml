@@ -61,7 +61,6 @@ steps:
 #    projectName: ''
 
 - script: |
-    echo "Running ESLint for the entire project..."
     npx eslint --config client/eslint.config.js --fix --format json -o eslint-report.json
   displayName: 'Run ESLint'
 
