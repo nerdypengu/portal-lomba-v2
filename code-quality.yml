@@ -60,14 +60,17 @@ steps:
 #    uploadSARIFReports: true
 #    projectName: ''
 
-- script: |
-    echo "Checking for existing ESLint config file..."
-    if (Test-Path "eslint.config.js") {
-      echo "ESLint config file exists."
-    } else {
-      echo "No ESLint config file found."
-    }
+- task: PowerShell@2
   displayName: 'Check for Existing ESLint Config'
+  inputs:
+    targetType: 'inline'
+    script: |
+      Write-Host "Checking for existing ESLint config file..."
+      if (Test-Path "eslint.config.js") {
+        Write-Host "ESLint config file exists."
+      } else {
+        Write-Host "No ESLint config file found."
+      }
 
 - script: |
     echo "Creating ESLint config file..."
