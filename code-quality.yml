@@ -82,7 +82,18 @@ steps:
     targetType: 'inline'
     script: |
       Write-Host "Creating ESLint config file..."
-      $eslintConfig = @"module.exports = {overrides: [{files: ["client/**/*"],configFile: "./client/eslint.config.js"}]};"@
+      $eslintConfig = 'module.exports = {'
+      $eslintConfig += '  overrides: ['
+      $eslintConfig += '    {'
+      $eslintConfig += '      files: ["client/**/*"],'
+      $eslintConfig += '      configFile: "./client/eslint.config.js"'
+      $eslintConfig += '    },'
+      $eslintConfig += '    {'
+      $eslintConfig += '      files: ["server/**/*"],'
+      $eslintConfig += '      configFile: "./server/eslint.config.js"'
+      $eslintConfig += '    }'
+      $eslintConfig += '  ]'
+      $eslintConfig += '};'
       Set-Content -Path "$(Build.SourcesDirectory)/eslint.config.js" -Value $eslintConfig
   condition: eq(variables['ESLINT_CONFIG_NOT_FOUND'], 'true')
 
