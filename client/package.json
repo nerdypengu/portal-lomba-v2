@@ -26,11 +26,8 @@
     "globals": "^15.12.0",
     "vite": "^6.0.1"
   },
-  {
   "scripts": {
     "build": "react-scripts build",
     "start": "react-scripts start"
   }
-}
-
 }
