@@ -2,6 +2,12 @@
 
 **Portal Lomba HMSI v2** is a web-based platform for showcasing and managing competition-related information. The project leverages Google Sheets API for automated data updates, CI/CD pipelines for automated deployment, and rigorous testing to ensure application reliability.
 
+Created by Group 11 PSO A:
+- Anisa Rahmah 5026211040
+- Karina Filza Aafiyah 5026221012
+- Eugenia Indrawan 5026221020
+- Mutiara Noor Fauzia 5026221045
+
 ## Key Features
 
 - **Google Sheets Integration**: Automatically updates competition data from spreadsheets.
