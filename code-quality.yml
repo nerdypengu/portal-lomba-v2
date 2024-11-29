@@ -61,7 +61,7 @@ steps:
 #    projectName: ''
 
 - script: |
-    npx eslint --config client/eslint.config.js --fix --format json -o eslint-report.json
+    npx eslint --config "client/eslint.config.js" --fix --format json -o eslint-report.json
   displayName: 'Run ESLint'
 
 # Publish report
