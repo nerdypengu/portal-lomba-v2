@@ -7,7 +7,7 @@ trigger:
 - main
 
 pool:
-  name: Muti
+  name: Mutia
 
 steps:
 - task: NodeTool@0
