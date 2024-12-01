@@ -1,7 +1,7 @@
 trigger: none
 
 pool:
-  name: Mutia
+  name: Host
 
 steps:
 # Checkout code dari repository GitHub
