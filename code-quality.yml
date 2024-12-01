@@ -22,7 +22,7 @@ steps:
     targetType: 'inline'
     script: |
       echo "Removing client node_modules directory..."
-      Remove-Item -Path "C:\agents\_work\1\s\node_modules" -Recurse -Force
+      Remove-Item -Path "C:\Users\mutia\Downloads\vsts-agent-win-x64-4.248.0\_work\1\s\node_modules" -Recurse -Force
 
 - script: |
     echo "Installing Client Dependencies"
