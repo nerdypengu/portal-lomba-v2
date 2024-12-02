@@ -1,1 +1,60 @@
+trigger: none
 
+pool:
+  name: devasc-anisa
+
+steps:
+# Checkout code dari repository GitHub
+- task: Checkout@1
+  inputs:
+    repository: 'self'
+    clean: true
+
+# Setup Node.js
+- task: NodeTool@0
+  displayName: 'Install Node.js'
+  inputs:
+    versionSpec: '18.x'
+
+# Install dependencies
+- script: |
+    npm install
+  displayName: 'Install Dependencies'
+
+# Dependency check dengan OWASP
+#- task: dependency-check-build-task@6
+#  inputs:
+#    format: 'HTML'
+#    uploadReports: true
+#    reportDirectory: '$(Build.ArtifactStagingDirectory)/dependency-check'
+#    reportFilename: 'dependency-check-report.html'
+#    scanPath: '$(Build.SourcesDirectory)/src'  # Lokasi untuk pemindaian dependensi
+#    cvssFailureThreshold: '7.0'
+#    uploadSARIFReports: true
+#    projectName: ''
+
+# Linting dengan fix
+- script: |
+    npx eslint . --fix --format json -o eslint-report.json
+  displayName: 'Run ESLint with Fix and Report'
+
+# Publish report
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'eslint-report.json'
+    ArtifactName: 'ESLint Report'
+  displayName: 'Publish ESLint Report'
+
+- task: DockerInstaller@0
+  inputs:
+    dockerVersion: '17.09.0-ce'
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'docker'
+    repository: 'anisarahmah/react'
+    command: 'buildAndPush'
+    Dockerfile: '**/Dockerfile'
+    tags: 'portal-lomba'
+    addPipelineData: false
+    addBaseImageData: false
