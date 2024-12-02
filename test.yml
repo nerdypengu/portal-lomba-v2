@@ -4,7 +4,7 @@ dependsOn:
   - BuildAndContainerize
 
 pool:
-  name: Host
+  name: karina
 
 stages:
 - stage: Testing
