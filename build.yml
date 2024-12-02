@@ -5,7 +5,7 @@ pool:
 
 variables:
   # Service connection name for Docker Registry
-  dockerRegistryServiceConnection: 'buildkarin'
+  dockerRegistryServiceConnection: 'cb233987-cf7a-4fa2-a805-80378c1f1f34'
   # Replace <YOUR-REGISTRY-NAME> with your Azure Container Registry name
   containerRegistry: 'docker.azurecr.io'
   imageNameFrontend: 'client'
