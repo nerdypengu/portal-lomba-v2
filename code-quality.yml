@@ -48,8 +48,8 @@ steps:
     cacheHitVar: NpmCacheRestored
   displayName: 'Cache Node.js Dependencies'
 
-# Dependency check dengan OWASP
-#- task: dependency-check-build-task@6
+# # Dependency check dengan OWASP
+# - task: dependency-check-build-task@6
 #  inputs:
 #    format: 'HTML'
 #    uploadReports: true
@@ -60,7 +60,7 @@ steps:
 #    uploadSARIFReports: true
 #    projectName: ''
 
-#Run ESlint
+# Run ESlint
 - script: |
     npx eslint --config client/eslint.config.js client --fix --format json -o eslint-report.json
   displayName: 'Run ESLint'
