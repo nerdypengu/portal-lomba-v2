@@ -4,8 +4,10 @@ pool:
   name: karina
 
 variables:
-  dockerRegistryServiceConnection: '<YOUR-DOCKER-SERVICE-CONNECTION>'
-  containerRegistry: '<YOUR-REGISTRY-NAME>.azurecr.io'
+  # Service connection name for Docker Registry
+  dockerRegistryServiceConnection: 'dockerregistry'
+  # Replace <YOUR-REGISTRY-NAME> with your Azure Container Registry name
+  containerRegistry: 'myregistry.azurecr.io'
   imageNameFrontend: 'frontend'
   imageNameBackend: 'backend'
 
@@ -40,9 +42,10 @@ stages:
       inputs:
         command: build
         containerRegistry: $(dockerRegistryServiceConnection)
+        repository: $(containerRegistry)/$(imageNameFrontend)
         dockerfile: client/Dockerfile
         tags: |
-          $(imageNameFrontend):$(Build.BuildId)
+          $(Build.BuildId)
 
     # Step 6: Dockerize Backend
     - task: Docker@2
@@ -50,9 +53,10 @@ stages:
       inputs:
         command: build
         containerRegistry: $(dockerRegistryServiceConnection)
+        repository: $(containerRegistry)/$(imageNameBackend)
         dockerfile: server/Dockerfile
         tags: |
-          $(imageNameBackend):$(Build.BuildId)
+          $(Build.BuildId)
 
     # Step 7: Push Docker Images
     - task: Docker@2
@@ -60,6 +64,15 @@ stages:
       inputs:
         command: push
         containerRegistry: $(dockerRegistryServiceConnection)
+        repository: $(containerRegistry)/$(imageNameFrontend)
         tags: |
-          $(containerRegistry)/$(imageNameFrontend):$(Build.BuildId)
-          $(containerRegistry)/$(imageNameBackend):$(Build.BuildId)
+          $(Build.BuildId)
+
+    - task: Docker@2
+      displayName: Push Backend Docker Image
+      inputs:
+        command: push
+        containerRegistry: $(dockerRegistryServiceConnection)
+        repository: $(containerRegistry)/$(imageNameBackend)
+        tags: |
+          $(Build.BuildId)
