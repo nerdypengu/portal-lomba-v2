@@ -17,46 +17,29 @@ stages:
     - task: Checkout@1
       displayName: Checkout Code
 
-    # Step 2: Authenticate with Docker Registry
-    - task: Docker@2
-      displayName: Docker Login
-      inputs:
-        containerRegistry: 'dockerregistry'
-        command: 'login'
-
-    # Step 3: Start Backend Service in Docker
-    - script: |
-        docker pull <YOUR_DOCKER_IMAGE>
-        docker run -d -p 5000:5000 --name backend-container <YOUR_DOCKER_IMAGE>
-      displayName: Start Backend Service in Docker
-
-    # Step 4: Install Dependencies
+    # Step 2: Install Dependencies
     - script: |
         npm install --prefix client --only=dev
         npm install --prefix server --only=dev
       displayName: Install Dependencies
 
-    # Step 5: Run Unit Tests (Frontend)
+    # Step 3: Run Unit Tests (Frontend)
     - script: npm test --prefix client
       displayName: Run Frontend Unit Tests
 
-    # Step 6: Run Unit Tests (Backend)
+    # Step 4: Run Unit Tests (Backend)
     - script: npm test --prefix server
       displayName: Run Backend Unit Tests
 
-    # Step 7: Run Integration Tests (Backend)
+    # Step 5: Run Integration Tests (Backend)
     - script: npm test:integration --prefix server
       displayName: Run Backend Integration Tests
 
-    # Step 8: Publish Test Results
+    # Step 6: Publish Test Results
     - task: PublishTestResults@2
       displayName: Publish Test Results
       inputs:
         testResultsFiles: '**/test-results.xml'
         testRunTitle: 'Test Results'
 
-    # Step 9: Clean Up Docker Container
-    - script: |
-        docker stop backend-container
-        docker rm backend-container
-      displayName: Clean Up Docker Container
+    # Step 7: Fail Pipeline if Tests Fail (Handled automatically by Azure DevOps)
