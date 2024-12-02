@@ -17,6 +17,12 @@ RUN echo "Installing Server Dependencies" && \
 # Menyalin seluruh file aplikasi ke dalam kontainer
 COPY . .
 
+# Menambahkan izin eksekusi untuk concurrently (pastikan ini dilakukan di server)
+RUN chmod +x ./server/node_modules/.bin/concurrently
+
+# Jika concurrently diperlukan secara global
+RUN npm install -g concurrently
+
 # Mengekspos port 3000 (sesuaikan dengan port yang digunakan aplikasi Anda)
 EXPOSE 3000
 
