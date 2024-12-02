@@ -1,16 +1,45 @@
-const express = require("express");
+const express = require('express');
+const cors = require('cors');
+
 const app = express();
-const cors = require("cors");
-const corsOptions = {
-  origin: ["http://localhost:5173"],
-};
 
-app.use(cors(corsOptions));
+// Enable CORS
+app.use(cors());
 
-app.get("/api", (req, res) => {
-  res.json({ fruits: ["apple", "strawberry", "pineapple"] });
+// Serve static files from the 'public' directory (Optional)
+app.use(express.static('public'));
+
+// API Routes
+app.get('/api', (req, res) => {
+  res.json({ message: 'Hello from backend!' });
 });
 
-app.listen(8080, () => {
-  console.log("Server started on port 8080");
+// Health Check Route
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'UP' });
+});
+
+// Get port from environment variables or default to 5000
+const PORT = process.env.PORT || 5000;
+
+// Start server
+const server = app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
+
+// Graceful Shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM signal received. Closing server...');
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT signal received. Closing server...');
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
 });

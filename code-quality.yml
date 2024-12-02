@@ -1,0 +1,73 @@
+trigger: none
+
+pool:
+  name: Host
+
+steps:
+# Checkout code dari repository GitHub
+- task: Checkout@1
+  inputs:
+    repository: 'self'
+    clean: true
+
+# Setup Node.js
+- task: NodeTool@0
+  displayName: 'Install Node.js'
+  inputs:
+    versionSpec: '18.x'
+
+- task: PowerShell@2
+  displayName: 'Remove client node_modules manually'
+  inputs:
+    targetType: 'inline'
+    script: |
+      echo "Removing client node_modules directory..."
+      Remove-Item -Path "C:\agents\_work\1\s\node_modules" -Recurse -Force
+
+- script: |
+    echo "Installing Client Dependencies"
+    npm ci install --prefix client
+    echo "Installing Server Dependencies"
+    npm ci install --prefix server
+  displayName: "Install Dependencies"
+
+- task: PowerShell@2
+  displayName: 'Ensure Cache Directory Exists'
+  inputs:
+    targetType: 'inline'
+    script: |
+      if (-not (Test-Path "$(Pipeline.Workspace)\.npm")) {
+          New-Item -ItemType Directory -Path "$(Pipeline.Workspace)\.npm"
+      }
+
+# Cache Node.js dependencies untuk mempercepat build selanjutnya
+- task: CacheBeta@2
+  inputs:
+    key: 'npm | "$(Agent.OS)" | $(Build.SourcesDirectory)/package-lock.json'  # Cache berdasarkan package-lock.json
+    path: $(Pipeline.Workspace)/.npm
+    cacheHitVar: NpmCacheRestored
+  displayName: 'Cache Node.js Dependencies'
+
+# Dependency check dengan OWASP
+#- task: dependency-check-build-task@6
+#  inputs:
+#    format: 'HTML'
+#    uploadReports: true
+#    reportDirectory: '$(Build.ArtifactStagingDirectory)/dependency-check'
+#    reportFilename: 'dependency-check-report.html'
+#    scanPath: '$(Build.SourcesDirectory)'  # Lokasi untuk pemindaian dependensi
+#    cvssFailureThreshold: '7.0'
+#    uploadSARIFReports: true
+#    projectName: 'FP-PSO-11'
+
+#Run ESlint
+- script: |
+    npx eslint --config client/eslint.config.js client --fix --format json -o eslint-report.json
+  displayName: 'Run ESLint'
+
+# Publish report
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'eslint-report.json'
+    ArtifactName: 'ESLint Report'
+  displayName: 'Publish ESLint Report'
