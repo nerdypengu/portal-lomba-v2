@@ -1,7 +1,7 @@
 trigger: none
 
 pool:
-  name: Host
+  name: devasc-anisa
 
 steps:
 # Checkout code dari repository GitHub
