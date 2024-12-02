@@ -4,14 +4,14 @@ FROM node:18
 # Tentukan direktori kerja di dalam kontainer
 WORKDIR /app
 
-# Menyalin file package.json dan package-lock.json untuk instalasi dependensi client dan server
-COPY package*.json ./client/
-COPY server/package*.json ./server/
-
-# Instalasi dependensi
+# Menyalin dan menginstal dependensi client
+COPY client/package*.json ./client/
 RUN echo "Installing Client Dependencies" && \
-    npm ci --prefix ./client && \
-    echo "Installing Server Dependencies" && \
+    npm ci --prefix ./client
+
+# Menyalin dan menginstal dependensi server
+COPY server/package*.json ./server/
+RUN echo "Installing Server Dependencies" && \
     npm ci --prefix ./server
 
 # Menyalin seluruh file aplikasi ke dalam kontainer
