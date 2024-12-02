@@ -35,7 +35,8 @@ steps:
 
 # Linting dengan fix
 - script: |
-    npx eslint . --fix --format json -o eslint-report.json
+    - script: |
+    npx eslint --config client/eslint.config.js client --fix --format json -o eslint-report.json
   displayName: 'Run ESLint with Fix and Report'
 
 # Publish report
