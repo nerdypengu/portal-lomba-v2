@@ -1,7 +1,7 @@
 trigger: none
 
 pool:
-  name: Host
+  name: karina
 
 variables:
   dockerRegistryServiceConnection: '<YOUR-DOCKER-SERVICE-CONNECTION>'
