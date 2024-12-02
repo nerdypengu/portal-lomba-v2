@@ -8,8 +8,8 @@ variables:
   dockerRegistryServiceConnection: 'buildkarin'
   # Replace <YOUR-REGISTRY-NAME> with your Azure Container Registry name
   containerRegistry: 'docker.azurecr.io'
-  imageNameFrontend: 'frontend'
-  imageNameBackend: 'backend'
+  imageNameFrontend: 'client'
+  imageNameBackend: 'server'
 
 stages:
 - stage: BuildAndContainerize
