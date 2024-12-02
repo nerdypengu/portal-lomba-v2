@@ -4,12 +4,11 @@ pool:
   name: karina
 
 variables:
-  # Service connection name for Docker Registry
   dockerRegistryServiceConnection: 'cb233987-cf7a-4fa2-a805-80378c1f1f34'
-  # Replace <YOUR-REGISTRY-NAME> with your Azure Container Registry name
   containerRegistry: 'docker.azurecr.io'
   imageNameFrontend: 'client'
   imageNameBackend: 'server'
+  System.Debug: true  # Enable detailed logs for debugging
 
 stages:
 - stage: BuildAndContainerize
@@ -58,9 +57,9 @@ stages:
         tags: |
           $(Build.BuildId)
 
-    # Step 7: Push Docker Images
+    # Step 7: Push Docker Images (Frontend)
     - task: Docker@2
-      displayName: Push Docker Images
+      displayName: Push Frontend Docker Image
       inputs:
         command: push
         containerRegistry: $(dockerRegistryServiceConnection)
@@ -68,6 +67,7 @@ stages:
         tags: |
           $(Build.BuildId)
 
+    # Step 8: Push Docker Images (Backend)
     - task: Docker@2
       displayName: Push Backend Docker Image
       inputs:
