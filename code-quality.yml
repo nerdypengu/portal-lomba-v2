@@ -1,7 +1,7 @@
 trigger: none
 
 pool:
-  name: devasc-anisa
+  name: Host
 
 steps:
 # Checkout code dari repository GitHub
@@ -55,7 +55,7 @@ steps:
     uploadReports: true
     reportDirectory: '$(Build.ArtifactStagingDirectory)/dependency-check'
     reportFilename: 'dependency-check-report.html'
-    scanPath: '$(Build.SourcesDirectory)/src'  # Lokasi untuk pemindaian dependensi
+    scanPath: '$(Build.SourcesDirectory)'  # Lokasi untuk pemindaian dependensi
     cvssFailureThreshold: '7.0'
     uploadSARIFReports: true
     projectName: ''
