@@ -1,0 +1,82 @@
+trigger: none
+
+pool:
+  name: karina
+
+variables:
+  dockerRegistryServiceConnection: 'cb233987-cf7a-4fa2-a805-80378c1f1f34'
+  containerRegistry: 'docker.azurecr.io'
+  imageNameFrontend: 'client'
+  imageNameBackend: 'server'
+  System.Debug: true  # Enable detailed logs for debugging
+
+stages:
+- stage: BuildAndContainerize
+  displayName: Build and Containerize
+  jobs:
+  - job: BuildAndContainerizeJob
+    displayName: Build and Containerize Job
+    steps:
+    # Step 1: Checkout code
+    - task: Checkout@1
+      displayName: Checkout Code
+
+    # Step 2: Install Dependencies (Frontend and Backend)
+    - script: |
+        npm install --prefix client
+        npm install --prefix server
+      displayName: Install Dependencies
+
+    # Step 3: Build Frontend
+    - script: npm run build --prefix client
+      displayName: Build Frontend
+
+    # Step 4: Build Backend
+    - script: npm run build --prefix server
+      displayName: Build Backend
+
+    # Step 5: Dockerize Frontend
+    - task: Docker@2
+      displayName: Build Docker Image (Frontend)
+      inputs:
+        command: build
+        containerRegistry: $(dockerRegistryServiceConnection)
+        repository: $(containerRegistry)/$(imageNameFrontend)
+        dockerfile: client/Dockerfile
+        tags: |
+          latest
+          $(Build.BuildId)
+
+    # Step 6: Dockerize Backend
+    - task: Docker@2
+      displayName: Build Docker Image (Backend)
+      inputs:
+        command: build
+        containerRegistry: $(dockerRegistryServiceConnection)
+        repository: $(containerRegistry)/$(imageNameBackend)
+        dockerfile: server/Dockerfile
+        tags: |
+          latest
+          $(Build.BuildId)
+
+    # Step 7: Push Docker Images (Frontend)
+    - task: Docker@2
+      displayName: Push Frontend Docker Image
+      inputs:
+        command: push
+        containerRegistry: $(dockerRegistryServiceConnection)
+        repository: $(containerRegistry)/$(imageNameFrontend)
+        tags: |
+          latest
+          $(Build.BuildId)
+
+    # Step 8: Push Docker Images (Backend)
+    - task: Docker@2
+      displayName: Push Backend Docker Image
+      inputs:
+        command: push
+        containerRegistry: $(dockerRegistryServiceConnection)
+        repository: $(containerRegistry)/$(imageNameBackend)
+        tags: |
+          latest
+          $(Build.BuildId)
