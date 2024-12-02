@@ -5,11 +5,11 @@ pool:
 
 variables:
   # Service connection name for Docker Registry
-  dockerRegistryServiceConnection: 'buildkarin'
+  dockerRegistryServiceConnection: buildkarin
   # Replace <YOUR-REGISTRY-NAME> with your Azure Container Registry name
-  containerRegistry: 'docker.azurecr.io'
-  imageNameFrontend: 'frontend'
-  imageNameBackend: 'backend'
+  containerRegistry: docker.azurecr.io
+  imageNameFrontend: frontend
+  imageNameBackend: backend
 
 stages:
 - stage: BuildAndContainerize
