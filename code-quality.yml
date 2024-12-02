@@ -58,7 +58,7 @@ steps:
     scanPath: '$(Build.SourcesDirectory)'  # Lokasi untuk pemindaian dependensi
     cvssFailureThreshold: '7.0'
     uploadSARIFReports: true
-    projectName: ''
+    projectName: 'FP-PSO-11'
 
 #Run ESlint
 - script: |
