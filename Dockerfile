@@ -19,7 +19,7 @@ RUN npm install -g concurrently
 COPY . .
 
 # Build aplikasi frontend menggunakan Vite
-RUN npm run build --prefix ./client
+#RUN npm run build --prefix ./client
 
 # Expose port yang digunakan oleh frontend dan backend
 EXPOSE 5000
