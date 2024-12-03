@@ -21,7 +21,7 @@ COPY . .
 RUN npm install -g concurrently
 
 # Mengekspos port 3000 (sesuaikan dengan port yang digunakan aplikasi Anda)
-EXPOSE 3000
+EXPOSE 5000
 
 # Menjalankan aplikasi dengan perintah npm start
 CMD ["npm", "start"]
