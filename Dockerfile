@@ -15,11 +15,12 @@ RUN echo "Installing Server Dependencies" && npm ci --prefix ./server
 # Menyalin seluruh file aplikasi ke dalam kontainer
 COPY . .
 
-# Build aplikasi React menggunakan Vite
-RUN npx vite build --config ./client/vite.config.js
+# Build aplikasi frontend
+RUN npm run build --prefix ./client
 
-# Mengekspos port yang digunakan oleh aplikasi Vite preview
-EXPOSE 4173
+# Expose port yang digunakan oleh frontend dan backend
+EXPOSE 5000
 
-# Jalankan Vite preview untuk melihat aplikasi hasil build
-CMD ["npx", "vite", "preview", "--config", "./client/vite.config.js"]
+# Jalankan kedua aplikasi secara bersamaan
+CMD npm run start-client --prefix ./client & npm run start-server --prefix ./server
+
