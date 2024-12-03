@@ -14,11 +14,14 @@ COPY server/package*.json ./server/
 RUN echo "Installing Server Dependencies" && \
     npm ci --prefix ./server
 
+# Jika concurrently diperlukan secara global
+RUN npm install -g concurrently
+
 # Menyalin seluruh file aplikasi ke dalam kontainer
 COPY . .
 
-# Jika concurrently diperlukan secara global
-RUN npm install -g concurrently
+# Build aplikasi React (Frontend)
+RUN npm run build --prefix ./client
 
 # Mengekspos port 3000 (sesuaikan dengan port yang digunakan aplikasi Anda)
 EXPOSE 5000
