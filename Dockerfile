@@ -1,23 +1,25 @@
-# Menggunakan Node.js sebagai base image
+# Menggunakan image Node.js sebagai base image
 FROM node:18
 
-# Set direktori kerja di dalam container
+# Tentukan direktori kerja di dalam kontainer
 WORKDIR /app
 
-# Salin file package.json dan package-lock.json untuk client
+# Menyalin dan menginstal dependensi client
 COPY client/package*.json ./client/
-
-# Instal dependensi untuk client
 RUN echo "Installing Client Dependencies" && npm ci --prefix ./client
 
-# Salin semua file aplikasi ke container
+# Menyalin dan menginstal dependensi server
+COPY server/package*.json ./server/
+RUN echo "Installing Server Dependencies" && npm ci --prefix ./server
+
+# Menyalin seluruh file aplikasi ke dalam kontainer
 COPY . .
 
 # Build aplikasi React menggunakan Vite
-RUN npx vite build --config ./client/vite.config.js --cwd ./client
+RUN npx vite build --config ./client/vite.config.js
 
-# Ekspose port untuk Vite preview
+# Mengekspos port yang digunakan oleh aplikasi Vite preview
 EXPOSE 4173
 
 # Jalankan Vite preview untuk melihat aplikasi hasil build
-CMD ["npx", "vite", "preview", "--config", "./client/vite.config.js", "--cwd", "./client"]
+CMD ["npx", "vite", "preview", "--config", "./client/vite.config.js"]
