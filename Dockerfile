@@ -12,15 +12,17 @@ RUN echo "Installing Client Dependencies" && npm ci --prefix ./client
 COPY server/package*.json ./server/
 RUN echo "Installing Server Dependencies" && npm ci --prefix ./server
 
+# Instal concurrently secara global
+RUN npm install -g concurrently
+
 # Menyalin seluruh file aplikasi ke dalam kontainer
 COPY . .
 
-# Build aplikasi frontend
+# Build aplikasi frontend menggunakan Vite
 RUN npm run build --prefix ./client
 
 # Expose port yang digunakan oleh frontend dan backend
 EXPOSE 5000
 
 # Jalankan kedua aplikasi secara bersamaan
-CMD npm run start-client --prefix ./client & npm run start-server --prefix ./server
-
+CMD ["concurrently", "npm run start-client --prefix ./client", "npm run start-server --prefix ./server"]
