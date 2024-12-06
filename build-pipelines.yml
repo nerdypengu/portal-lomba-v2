@@ -30,8 +30,7 @@ steps:
     repository: 'portal-lomba'
     command: 'buildAndPush'
     Dockerfile: './Dockerfile' # Ensure correct path to Dockerfile
-    tags: |
-      $(Build.BuildId) # Optional: Unique tag for each build
+    tags: 'latest'
 
 - task: PublishBuildArtifacts@1
   inputs:
