@@ -1,0 +1,153 @@
+trigger:
+  # branches:
+  #   include:
+  #     - main # Trigger hanya pada branch main
+  none
+
+pool:
+  name: Mutia
+
+stages:
+  # Stage 1: Code Quality and Linting
+  - stage: CodeQuality
+    displayName: Code Quality and Linting
+    jobs:
+      - job: Linting
+        displayName: Code Linting Job
+        steps:
+          # Step 1: Setup Node.js environment
+          - task: UseNode@2
+            inputs:
+              versionSpec: '16.x'
+            displayName: Setup Node.js 16.x
+
+          # Step 2: Install dependencies
+          - script: |
+              echo Installing project dependencies...
+              npm install
+            displayName: Install Dependencies
+
+          # Step 3: Run ESLint
+          - script: |
+              echo Running ESLint for code quality check...
+              npm run lint
+            displayName: Run ESLint
+
+          # Step 4: Fail on linting errors
+          - task: PublishBuildArtifacts@1
+            inputs:
+              pathToPublish: $(Build.SourcesDirectory)/lint-results
+              artifactName: lint-results
+            displayName: Publish Lint Results
+
+  # Stage 2: Build and Containerization
+  - stage: Build
+    dependsOn: CodeQuality
+    condition: succeeded()
+    displayName: Build and Dockerization
+    jobs:
+      - job: BuildDocker
+        displayName: Build and Dockerize Application
+        steps:
+          # Step 1: Setup Node.js environment
+          - task: UseNode@2
+            inputs:
+              versionSpec: '16.x'
+            displayName: Setup Node.js 16.x
+
+          # Step 2: Install dependencies
+          - script: |
+              echo Installing project dependencies...
+              npm install
+            displayName: Install Dependencies
+
+          # Step 3: Build frontend and backend
+          - script: |
+              echo Building frontend and backend code...
+              npm run build
+            displayName: Build Application
+
+          # Step 4: Dockerize Application
+          - task: Docker@2
+            inputs:
+              command: buildAndPush
+              containerRegistry: $(dockerRegistryServiceConnection)
+              repository: my-app
+              tags: |
+                $(Build.BuildId)
+            displayName: Build and Push Docker Image to Registry
+
+  # Stage 3: Testing
+  - stage: Testing
+    dependsOn: Build
+    condition: succeeded()
+    displayName: Run Unit and Integration Tests
+    jobs:
+      - job: Test
+        displayName: Testing Job
+        steps:
+          # Step 1: Setup Node.js environment
+          - task: UseNode@2
+            inputs:
+              versionSpec: '16.x'
+            displayName: Setup Node.js 16.x
+
+          # Step 2: Install dependencies
+          - script: |
+              echo Installing test dependencies...
+              npm install
+            displayName: Install Dependencies
+
+          # Step 3: Run unit and integration tests
+          - script: |
+              echo Running tests...
+              npm test
+            displayName: Run Tests
+
+          # Step 4: Publish test results
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFiles: '/test-results.xml'
+            displayName: Publish Test Results
+
+  # Stage 4: Deployment
+  - stage: Deploy
+    dependsOn: Testing
+    condition: succeeded()
+    displayName: Deploy to Azure Web App
+    jobs:
+      - job: Deploy
+        displayName: Deployment Job
+        steps:
+          # Step 1: Pull Docker Image
+          - task: Docker@2
+            inputs:
+              command: pull
+              containerRegistry: $(dockerRegistryServiceConnection)
+              repository: my-app
+              tags: |
+                $(Build.BuildId)
+            displayName: Pull Docker Image from Registry
+
+          # Step 2: Deploy to Azure Web App
+          - task: AzureWebAppContainer@1
+            inputs:
+              azureSubscription: $(azureSubscription)
+              appName: my-web-app
+              imageName: $(dockerRegistry)/my-app:$(Build.BuildId)
+            displayName: Deploy to Azure Web App
+
+          # Step 3: Run Smoke Test
+          - script: |
+              echo Running smoke test to validate deployment...
+              chmod +x smoke-test.sh
+              ./smoke-test.sh
+            displayName: Run Smoke Test
+
+          # Step 4: Rollback if smoke test fails
+          - script: |
+              echo Rolling back deployment due to failed smoke test...
+              chmod +x rollback.sh
+              ./rollback.sh
+            condition: failed()
+            displayName: Rollback Deployment on Failure
