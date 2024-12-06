@@ -16,7 +16,7 @@ stages:
         displayName: Code Linting Job
         steps:
           # Step 1: Setup Node.js environment
-          - task: UseNode@2
+          - task: NodeTool@0
             inputs:
               versionSpec: '16.x'
             displayName: Setup Node.js 16.x
@@ -30,15 +30,15 @@ stages:
           # Step 3: Run ESLint
           - script: |
               echo Running ESLint for code quality check...
-              npm run lint
+              npx eslint --config client/eslint.config.js client --fix --format json -o eslint-report.json
             displayName: Run ESLint
 
           # Step 4: Fail on linting errors
           - task: PublishBuildArtifacts@1
             inputs:
-              pathToPublish: $(Build.SourcesDirectory)/lint-results
-              artifactName: lint-results
-            displayName: Publish Lint Results
+              PathtoPublish: 'eslint-report.json'
+              ArtifactName: 'ESLint Report'
+            displayName: 'Publish ESLint Report'
 
   # Stage 2: Build and Containerization
   - stage: Build
@@ -50,10 +50,10 @@ stages:
         displayName: Build and Dockerize Application
         steps:
           # Step 1: Setup Node.js environment
-          - task: UseNode@2
+          - task: NodeTool@0
+            displayName: 'Install Node.js'
             inputs:
               versionSpec: '16.x'
-            displayName: Setup Node.js 16.x
 
           # Step 2: Install dependencies
           - script: |
@@ -70,12 +70,13 @@ stages:
           # Step 4: Dockerize Application
           - task: Docker@2
             inputs:
-              command: buildAndPush
-              containerRegistry: $(dockerRegistryServiceConnection)
-              repository: my-app
-              tags: |
-                $(Build.BuildId)
-            displayName: Build and Push Docker Image to Registry
+              containerRegistry: 'docker'
+              repository: 'anisarahmah/react'
+              command: 'buildAndPush'
+              Dockerfile: '**/Dockerfile'
+              tags: 'portal-lomba'
+              addPipelineData: false
+              addBaseImageData: false
 
   # Stage 3: Testing
   - stage: Testing
@@ -87,7 +88,7 @@ stages:
         displayName: Testing Job
         steps:
           # Step 1: Setup Node.js environment
-          - task: UseNode@2
+          - task: NodeTool@0
             inputs:
               versionSpec: '16.x'
             displayName: Setup Node.js 16.x
@@ -123,19 +124,18 @@ stages:
           - task: Docker@2
             inputs:
               command: pull
-              containerRegistry: $(dockerRegistryServiceConnection)
-              repository: my-app
-              tags: |
-                $(Build.BuildId)
+              containerRegistry: 'docker'
+              repository: 'react'
+              tags: 'portal-lomba'
             displayName: Pull Docker Image from Registry
 
           # Step 2: Deploy to Azure Web App
-          - task: AzureWebAppContainer@1
-            inputs:
-              azureSubscription: $(azureSubscription)
-              appName: my-web-app
-              imageName: $(dockerRegistry)/my-app:$(Build.BuildId)
-            displayName: Deploy to Azure Web App
+          #- task: AzureWebAppContainer@1
+          #  inputs:
+          #    azureSubscription: $(azureSubscription)
+          #    appName: my-web-app
+          #    imageName: $(dockerRegistry)/my-app:$(Build.BuildId)
+          #  displayName: Deploy to Azure Web App
 
           # Step 3: Run Smoke Test
           - script: |
