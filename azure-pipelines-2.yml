@@ -29,9 +29,9 @@ stages:
 
           # Step 3: Run ESLint
           - script: |
-              echo Running ESLint for code quality check...
+              - script: |
               npx eslint --config client/eslint.config.js client --fix --format json -o eslint-report.json
-            displayName: Run ESLint
+            displayName: 'Run ESLint with Fix and Report'
 
           # Step 4: Fail on linting errors
           - task: PublishBuildArtifacts@1
