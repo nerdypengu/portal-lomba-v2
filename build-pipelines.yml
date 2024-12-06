@@ -1,0 +1,40 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+# Step 1: Install Node.js
+- task: NodeTool@0
+  inputs:
+    versionSpec: '20.x' # Change to match your project requirements
+  displayName: 'Install Node.js'
+
+# Step 2: Install dependencies and build
+- script: |
+    echo Installing dependencies...
+    npm install
+    echo Building frontend...
+    npm run build:frontend
+    echo Building backend...
+    npm run build:backend
+  displayName: 'Install and Build Frontend and Backend'
+
+# Step 3: Build and Push Docker Images
+- task: Docker@2
+  inputs:
+    containerRegistry: 'dockerhub-mut-reg-con'
+    repository: 'portal-lomba'
+    command: 'buildAndPush'
+    Dockerfile: './Dockerfile' # Ensure correct path to Dockerfile
+    tags: |
+      $(Build.BuildId) # Optional: Unique tag for each build
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
