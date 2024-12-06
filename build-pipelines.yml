@@ -4,7 +4,7 @@ trigger:
       - main
 
 pool:
-  vmImage: ubuntu-latest
+  name: devasc-anisa
 
 steps:
 # Step 1: Install Node.js
