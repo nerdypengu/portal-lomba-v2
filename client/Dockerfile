@@ -1,5 +1,5 @@
 # Step 1: Build the React app
-FROM node:20-alpine AS builder # Use Node.js 20 for compatibility with structuredClone
+FROM node:20-alpine AS builder
 WORKDIR /app
 COPY package.json package-lock.json ./ 
 RUN npm install
