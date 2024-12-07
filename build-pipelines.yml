@@ -4,7 +4,7 @@ trigger:
       - main
 
 pool:
-  name: devasc-anisa
+  name: devasc-mut
 
 steps:
 # Step 1: Install Node.js
