@@ -37,7 +37,7 @@ steps:
     containerRegistry: 'dockerhub-mut-reg-con'
     repository: 'portal-lomba-backend'
     command: 'buildAndPush'
-    Dockerfile: './server/Dockerfile' # Path to server Dockerfile
+    Dockerfile: 'server/Dockerfile' # Path to server Dockerfile
     tags: 'latest'
 
 - task: PublishBuildArtifacts@1
