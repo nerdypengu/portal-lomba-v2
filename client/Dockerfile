@@ -1,10 +1,10 @@
 # Step 1: Build the React app
-FROM node:16-alpine AS builder
+FROM node:20-alpine AS builder # Use Node.js 20 for compatibility with structuredClone
 WORKDIR /app
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json ./ 
 RUN npm install
-COPY . .
-RUN npm run build
+COPY . . 
+RUN npm run build 
 
 # Step 2: Serve the built app with Nginx
 FROM nginx:1.21-alpine
