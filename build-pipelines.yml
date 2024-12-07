@@ -27,9 +27,17 @@ steps:
 - task: Docker@2
   inputs:
     containerRegistry: 'dockerhub-mut-reg-con'
-    repository: 'portal-lomba'
+    repository: 'portal-lomba-frontend'
     command: 'buildAndPush'
-    Dockerfile: './Dockerfile' # Ensure correct path to Dockerfile
+    Dockerfile: './client/Dockerfile' # Path to client Dockerfile
+    tags: 'latest'
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'dockerhub-mut-reg-con'
+    repository: 'portal-lomba-backend'
+    command: 'buildAndPush'
+    Dockerfile: './server/Dockerfile' # Path to server Dockerfile
     tags: 'latest'
 
 - task: PublishBuildArtifacts@1
