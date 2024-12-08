@@ -1,27 +1,14 @@
-# Base image
-FROM node:18 AS build
-
-# Set working directory
+# Step 1: Build the React app
+FROM node:20-alpine AS builder
 WORKDIR /app
-
-# Copy package.json and package-lock.json
-COPY package*.json ./
-
-# Install dependencies
+COPY package.json package-lock.json ./
 RUN npm install
-
-# Copy the rest of the application
-COPY . .
-
-# Build the React app
+COPY . . 
 RUN npm run build
 
-# Serve the React app
-FROM nginx:1.23
-COPY --from=build /app/build /usr/share/nginx/html
-
-# Expose port 80
+# Step 2: Serve the built app with Nginx
+FROM nginx:1.21-alpine
+# Update this path to reflect the correct Vite output directory
+COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 80
-
-# Start nginx server
 CMD ["nginx", "-g", "daemon off;"]
