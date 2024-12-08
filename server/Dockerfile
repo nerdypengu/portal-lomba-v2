@@ -1,17 +1,16 @@
-FROM node:18
+# Step 1: Base image
+FROM node:20-alpine
 
-# Set working directory
+# Step 2: Set working directory
 WORKDIR /app
 
-# Copy package.json and install dependencies
-COPY package*.json ./
+# Step 3: Copy package.json and install dependencies
+COPY package.json package-lock.json ./
 RUN npm install
 
-# Copy the rest of the app
+# Step 4: Copy application code
 COPY . .
 
-# Expose port
-EXPOSE 8080
-
-# Start the server
+# Step 5: Expose the required port and run the server
+EXPOSE 5000
 CMD ["node", "server.js"]
