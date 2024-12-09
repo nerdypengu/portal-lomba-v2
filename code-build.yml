@@ -39,11 +39,13 @@ steps:
     ArtifactName: 'ESLint Report'
   displayName: 'Publish ESLint Report'
 
+
+
 - task: SonarQubePrepare@7
   inputs:
     SonarQube: 'sonar'
     scannerMode: 'cli'
-    cliScannerVersion: '4.7'
+    cliScannerVersion: '6.2'
     configMode: 'manual'
     cliProjectKey: 'myproject'
     cliProjectName: 'portal-lomba'
