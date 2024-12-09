@@ -39,22 +39,12 @@ steps:
     ArtifactName: 'ESLint Report'
   displayName: 'Publish ESLint Report'
 
-
-
 - task: SonarQubePrepare@7
   inputs:
     SonarQube: 'sonar'
     scannerMode: 'cli'
     cliScannerVersion: '6.2.1.4610'
-    configMode: 'manual'
-    cliProjectKey: 'myproject'
-    cliProjectName: 'portal-lomba'
-    cliSources: '.'
-    extraProperties: |
-      # Additional properties that will be passed to the scanner, 
-      # Put one key=value per line, example:
-      # sonar.exclusions=**/*.bin
-      sonar.java.binaries=.
+    configMode: 'file'
 
 - task: SonarQubeAnalyze@7
   inputs:
