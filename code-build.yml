@@ -51,7 +51,8 @@ steps:
       # Additional properties that will be passed to the scanner, 
       # Put one key=value per line, example:
       # sonar.exclusions=**/*.bin
-      sonar.java.binaries=.
+      sonar.sources=.
+      sonar.java.binaries=target/classes
 
 - task: SonarQubeAnalyze@7
   inputs:
