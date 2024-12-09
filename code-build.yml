@@ -21,17 +21,10 @@ steps:
     npm install
   displayName: 'Install Dependencies'
 
-# Dependency check dengan OWASP
-#- task: dependency-check-build-task@6
-#  inputs:
-#    format: 'HTML'
-#    uploadReports: true
-#    reportDirectory: '$(Build.ArtifactStagingDirectory)/dependency-check'
-#    reportFilename: 'dependency-check-report.html'
-#    scanPath: '$(Build.SourcesDirectory)/src'  # Lokasi untuk pemindaian dependensi
-#    cvssFailureThreshold: '7.0'
-#    uploadSARIFReports: true
-#    projectName: ''
+# Install dependencies
+- script: |
+    npm audit
+  displayName: 'Install Dependencies'
 
 # Linting dengan fix
 - script: |
@@ -45,6 +38,28 @@ steps:
     PathtoPublish: 'eslint-report.json'
     ArtifactName: 'ESLint Report'
   displayName: 'Publish ESLint Report'
+
+- task: SonarQubePrepare@7
+  inputs:
+    SonarQube: 'sonar'
+    scannerMode: 'cli'
+    configMode: 'manual'
+    cliProjectKey: 'myproject'
+    cliProjectName: 'portal-lomba'
+    cliSources: '.'
+    extraProperties: |
+      # Additional properties that will be passed to the scanner, 
+      # Put one key=value per line, example:
+      # sonar.exclusions=**/*.bin
+      sonar.java.binaries=.
+
+- task: SonarQubeAnalyze@7
+  inputs:
+    jdkversion: 'JAVA_HOME_17_X64'
+
+- task: SonarQubePublish@7
+  inputs:
+    pollingTimeoutSec: '300'
 
 - task: DockerInstaller@0
   inputs:
