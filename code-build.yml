@@ -43,8 +43,15 @@ steps:
   inputs:
     SonarQube: 'sonar'
     scannerMode: 'cli'
-    cliScannerVersion: '6.2.1.4610'
-    configMode: 'file'
+    configMode: 'manual'
+    cliProjectKey: 'myproject'
+    cliProjectName: 'portal-lomba'
+    cliSources: '.'
+    extraProperties: |
+      # Additional properties that will be passed to the scanner, 
+      # Put one key=value per line, example:
+      # sonar.exclusions=**/*.bin
+      sonar.java.binaries=.
 
 - task: SonarQubeAnalyze@7
   inputs:
