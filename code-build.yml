@@ -39,10 +39,10 @@ steps:
     ArtifactName: 'ESLint Report'
   displayName: 'Publish ESLint Report'
 
-- task: SonarQubePrepare@5
+- task: SonarQubePrepare@7
   inputs:
     SonarQube: 'sonar'
-    scannerMode: 'cli'
+    scannerMode: 'CLI'
     configMode: 'manual'
     cliProjectKey: 'myproject'
     cliProjectName: 'portal-lomba'
@@ -53,9 +53,11 @@ steps:
       # sonar.exclusions=**/*.bin
       sonar.java.binaries=.
 
-- task: SonarQubeAnalyze@5
+- task: SonarQubeAnalyze@7
+  inputs:
+    jdkversion: 'JAVA_HOME'
 
-- task: SonarQubePublish@5
+- task: SonarQubePublish@7
   inputs:
     pollingTimeoutSec: '300'
 
