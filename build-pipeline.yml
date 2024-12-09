@@ -1,0 +1,53 @@
+trigger: none
+#   branches:
+#     include:
+#       - main
+
+pool:
+  name: devasc-anisa
+
+steps:
+# Step 1: Install Node.js
+- task: NodeTool@0
+  inputs:
+    versionSpec: '20.x' # Change to match your project requirements
+  displayName: 'Install Node.js'
+
+# Step 2: Install dependencies and build
+- script: |
+    echo Installing dependencies...
+    npm run install
+    echo Building frontend...
+    npm run build:frontend
+    echo Building backend...
+    npm run build:backend
+  displayName: 'Install and Build Frontend and Backend'
+
+- task: Docker@2
+  displayName: Login to Docker Hub
+  inputs:
+    command: 'login'
+    containerRegistry: 'dockerhub-mut-reg-con'
+
+# Step 3: Build and Push Docker Images
+- task: Docker@2
+  inputs:
+    containerRegistry: 'dockerhub-mut-reg-con'
+    repository: 'moetzie/portal-lomba'
+    command: 'buildAndPush'
+    Dockerfile: 'client/Dockerfile' # Path to client Dockerfile
+    tags: 'latest'
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'dockerhub-mut-reg-con'
+    repository: 'moetzie/portal-lomba'
+    command: 'buildAndPush'
+    Dockerfile: 'server/Dockerfile' # Path to server Dockerfile
+    tags: 'latest'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
