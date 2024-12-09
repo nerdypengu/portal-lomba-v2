@@ -45,7 +45,7 @@ steps:
   inputs:
     SonarQube: 'sonar'
     scannerMode: 'cli'
-    cliScannerVersion: '6.2'
+    cliScannerVersion: '6.2.1.4610'
     configMode: 'manual'
     cliProjectKey: 'myproject'
     cliProjectName: 'portal-lomba'
