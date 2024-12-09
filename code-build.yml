@@ -42,7 +42,8 @@ steps:
 - task: SonarQubePrepare@7
   inputs:
     SonarQube: 'sonar'
-    scannerMode: 'CLI'
+    scannerMode: 'cli'
+    cliScannerVersion: '4.7'
     configMode: 'manual'
     cliProjectKey: 'myproject'
     cliProjectName: 'portal-lomba'
