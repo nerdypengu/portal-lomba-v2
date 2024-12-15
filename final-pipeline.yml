@@ -72,30 +72,33 @@ stages:
             displayName: 'Install and Build Frontend'
 
           - task: Docker@2
-            displayName: 'Login to Docker Hub'
+            displayName: Login to Docker Hub
             inputs:
               command: 'login'
-              containerRegistry: $(dockerRegistryServiceConnection)
+              containerRegistry: 'dockerhub-mut-reg-con'
 
-          # Build and Push Frontend Image
+          # Step 3: Build and Push Docker Images
           - task: Docker@2
             inputs:
-              containerRegistry: $(dockerRegistryServiceConnection)
-              repository: $(dockerRepositoryFrontend)
+              containerRegistry: 'dockerhub-mut-reg-con'
+              repository: 'moetzie/portal-lomba'
               command: 'buildAndPush'
-              Dockerfile: 'client/Dockerfile'
-              tags: $(dockerImageTagFE)
-            displayName: 'Build and Push Frontend Image'
+              Dockerfile: 'client/Dockerfile' # Path to client Dockerfile
+              tags: 'latest'
 
-          # Build and Push Backend Image
           - task: Docker@2
             inputs:
-              containerRegistry: $(dockerRegistryServiceConnection)
-              repository: $(dockerRepositoryBackend)
+              containerRegistry: 'dockerhub-mut-reg-con'
+              repository: 'moetzie/portal-lomba'
               command: 'buildAndPush'
-              Dockerfile: 'server/Dockerfile'
-              tags: $(dockerImageTagBE)
-            displayName: 'Build and Push Backend Image'
+              Dockerfile: 'server/Dockerfile' # Path to server Dockerfile
+              tags: 'latest'
+
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: 'drop'
+              publishLocation: 'Container'
 
   # Stage 3: Testing
   - stage: Testing
