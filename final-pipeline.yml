@@ -4,13 +4,14 @@ pool:
   name: devasc-mut  # Ganti dengan pool sesuai kebutuhan
 
 variables:
-  dockerRegistryServiceConnection: 'dockerhub-mut-reg-con'
-  dockerRepositoryFrontend: 'moetzie/portal-lomba'
-  dockerRepositoryBackend: 'moetzie/portal-lomba'
-  dockerImageTagFE: 'frontend-latest'
-  dockerImageTagBE: 'backend-latest'
-  azureSubscription: 'resourcemut'
-  azureWebAppName: 'portal-lomba'
+  # dockerRegistryServiceConnection: 'dockerhub-mut-reg-con'
+  # dockerRepositoryFrontend: 'moetzie/portal-lomba'
+  # dockerRepositoryBackend: 'moetzie/portal-lomba'
+  # dockerImageTagFE: 'frontend-latest'
+  # dockerImageTagBE: 'backend-latest'
+  # azureSubscription: 'resourcemut'
+  # azureWebAppName: 'portal-lomba'
+  - group: FP-PSO11
 
 stages:
   # Stage 1: Code Quality
