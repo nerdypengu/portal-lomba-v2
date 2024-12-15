@@ -54,6 +54,16 @@ steps:
       sonar.sources=.
       sonar.java.binaries=target/classes
 
+- script: |
+    sonar-scanner
+    displayName: 'Run SonarQube Analysis'
+
+- task: SonarQubePublish@5
+  inputs:
+    pollingTimeoutSec: '300'
+  displayName: 'Publish Quality Gate Result'
+
+
 - task: SonarQubeAnalyze@7
   inputs:
     jdkversion: 'JAVA_HOME'
