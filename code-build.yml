@@ -44,7 +44,7 @@ steps:
     SonarQube: 'sonar'
     scannerMode: 'cli'
     configMode: 'manual'
-    cliProjectKey: 'myproject'
+    cliProjectKey: 'FP-PSO-11_FP-PSO-11_AZPKLNXakXt54pvTXdAs'
     cliProjectName: 'portal-lomba'
     cliSources: '.'
     extraProperties: |
