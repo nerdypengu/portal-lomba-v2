@@ -33,7 +33,6 @@ stages:
 
       # Linting dengan fix
       - script: |
-          - script: |
           npx eslint --config client/eslint.config.js client --fix --format json -o eslint-report.json
         displayName: 'Run ESLint with Fix and Report'
       
