@@ -18,7 +18,6 @@ variables:
     value: 'resourcemut'
   - name: azureWebAppName
     value: 'portal-lomba'
-  - group: FP-PSO11
 
 stages:
   # Stage 1: Code Quality
