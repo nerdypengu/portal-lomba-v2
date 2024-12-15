@@ -44,8 +44,8 @@ steps:
     SonarQube: 'sonar'
     scannerMode: 'cli'
     configMode: 'manual'
-    cliProjectKey: 'FP-MyProject'
-    cliProjectName: 'My React Project'
+    cliProjectKey: 'FP-PSO-11_FP-PSO-11_AZPKLNXakXt54pvTXdAs'
+    cliProjectName: 'Portal Lomba'
     cliSources: 'src'
 
 # Task analisis (biasanya ada setelahnya)
