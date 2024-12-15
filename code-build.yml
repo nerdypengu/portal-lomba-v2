@@ -47,16 +47,19 @@ steps:
     cliProjectKey: 'FP-PSO-11_FP-PSO-11_AZPKLNXakXt54pvTXdAs'
     cliProjectName: 'Portal Lomba'
     cliSources: '.'
+    extraProperties: |
+      sonar.sources=.
+      sonar.exclusions=**/*.test.js
+      sonar.javascript.lcov.reportPaths=coverage/lcov-report/lcov.info
 
-# Task analisis (biasanya ada setelahnya)
+# Jalankan SonarQube langsung tanpa build
 - task: SonarQubeAnalyze@7
   displayName: 'Run SonarQube analysis'
 
-# Task publish report ke artifact
-- task: PublishBuildArtifacts@1
-  inputs:
-    artifactName: 'sonar-report'
-    publishLocation: 'Container'
+# Publish hasil analisis
+- task: SonarQubePublish@7
+  displayName: 'Publish SonarQube Report'
+
 
 - task: DockerInstaller@0
   inputs:
