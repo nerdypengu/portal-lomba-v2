@@ -1,0 +1,188 @@
+trigger: none  # Trigger manual; ubah sesuai kebutuhan
+
+pool:
+  name: devasc-mut  # Ganti dengan pool sesuai kebutuhan
+
+variables:
+  dockerRegistryServiceConnection: 'dockerhub-mut-reg-con'
+  dockerRepositoryFrontend: 'moetzie/portal-lomba'
+  dockerRepositoryBackend: 'moetzie/portal-lomba'
+  dockerImageTagFE: 'frontend-latest'
+  dockerImageTagBE: 'backend-latest'
+  azureSubscription: 'resourcemut'
+  azureWebAppName: 'portal-lomba'
+
+stages:
+  # Stage 1: Code Quality
+  - stage: CodeQuality
+    displayName: 'Code Quality Analysis'
+    jobs:
+      - job: CodeQuality
+        displayName: 'Run Code Quality Tools'
+        steps:
+          - task: Checkout@1
+            displayName: 'Checkout Code'
+
+          - task: NodeTool@0
+            displayName: 'Install Node.js'
+            inputs:
+              versionSpec: '18.x'
+
+          - script: |
+              echo "Installing Dependencies..."
+              npm ci install --prefix client
+              npm ci install --prefix server
+            displayName: 'Install Dependencies'
+
+          # ESLint for Code Linting
+          - script: |
+              echo "Running ESLint..."
+              npx eslint --config client/eslint.config.js client --format json -o eslint-report.json
+            displayName: 'Run ESLint'
+
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: 'eslint-report.json'
+              ArtifactName: 'ESLint Report'
+            displayName: 'Publish ESLint Report'
+
+  # Stage 2: Build and Push Docker Images
+  - stage: Build
+    displayName: 'Build Docker Images'
+    dependsOn: CodeQuality
+    jobs:
+      - job: Build
+        displayName: 'Build and Push Docker Images'
+        steps:
+          - task: Checkout@1
+            displayName: 'Checkout Code'
+
+          - task: NodeTool@0
+            displayName: 'Install Node.js'
+            inputs:
+              versionSpec: '18.x'
+
+          - script: |
+              echo "Installing Frontend and Backend Dependencies..."
+              npm ci install --prefix client
+              npm ci install --prefix server
+              echo "Building Frontend..."
+              npm run build --prefix client
+            displayName: 'Install and Build Frontend'
+
+          - task: Docker@2
+            displayName: 'Login to Docker Hub'
+            inputs:
+              command: 'login'
+              containerRegistry: $(dockerRegistryServiceConnection)
+
+          # Build and Push Frontend Image
+          - task: Docker@2
+            inputs:
+              containerRegistry: $(dockerRegistryServiceConnection)
+              repository: $(dockerRepositoryFrontend)
+              command: 'buildAndPush'
+              Dockerfile: 'client/Dockerfile'
+              tags: $(dockerImageTagFE)
+            displayName: 'Build and Push Frontend Image'
+
+          # Build and Push Backend Image
+          - task: Docker@2
+            inputs:
+              containerRegistry: $(dockerRegistryServiceConnection)
+              repository: $(dockerRepositoryBackend)
+              command: 'buildAndPush'
+              Dockerfile: 'server/Dockerfile'
+              tags: $(dockerImageTagBE)
+            displayName: 'Build and Push Backend Image'
+
+  # Stage 3: Testing
+  - stage: Testing
+    displayName: 'Run Tests'
+    dependsOn: Build
+    jobs:
+      - job: Test
+        displayName: 'Run Unit and Integration Tests'
+        steps:
+          - task: Checkout@1
+            displayName: 'Checkout Code'
+
+          - task: NodeTool@0
+            displayName: 'Install Node.js'
+            inputs:
+              versionSpec: '18.x'
+
+          - script: |
+              echo "Installing Dependencies..."
+              npm ci install --prefix server
+            displayName: 'Install Backend Dependencies'
+
+          # Run Jest Unit Test
+          - script: |
+              echo "Running Unit Tests..."
+              npm test --prefix server -- --coverage --outputFile=test-result.json --json
+            displayName: 'Run Unit Tests with Jest'
+
+          # Publish Test Results
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: 'server/test-result.json'
+              ArtifactName: 'Test Results'
+            displayName: 'Publish Test Results'
+
+          # Run Integration Test (Simplified)
+          - script: |
+              echo "Running Integration Tests..."
+              npm run integration-test --prefix server || exit 1
+            displayName: 'Run Integration Tests'
+
+  # # Stage 4: Deployment to Azure App Service
+  # - stage: Deployment
+  #   displayName: 'Deploy to Azure App Services'
+  #   dependsOn: Testing
+  #   jobs:
+  #     - deployment: Deploy
+  #       displayName: 'Deploy Application'
+  #       environment: 'production'
+  #       strategy:
+  #         runOnce:
+  #           deploy:
+  #             steps:
+  #               - task: Checkout@1
+  #                 displayName: 'Checkout Code'
+
+  #               - task: AzureWebAppContainer@1
+  #                 displayName: 'Deploy Frontend to Azure Web App'
+  #                 inputs:
+  #                   azureSubscription: $(azureSubscription)
+  #                   appName: $(azureWebAppName)
+  #                   deployToSlotOrASE: true
+  #                   resourceGroupName: 'FPPSO11'
+  #                   dockerRegistryServiceConnection: $(dockerRegistryServiceConnection)
+  #                   imageName: $(dockerRepositoryFrontend):$(dockerImageTagFE)
+
+  #               - task: AzureWebAppContainer@1
+  #                 displayName: 'Deploy Backend to Azure Web App'
+  #                 inputs:
+  #                   azureSubscription: $(azureSubscription)
+  #                   appName: $(azureWebAppName)
+  #                   deployToSlotOrASE: true
+  #                   dockerRegistryServiceConnection: $(dockerRegistryServiceConnection)
+  #                   imageName: $(dockerRepositoryBackend):$(dockerImageTagBE)
+
+  #               # Smoke Test (Simplified Example)
+  #               - script: |
+  #                   echo "Running Smoke Test..."
+  #                   curl -f https://$(azureWebAppName).azurewebsites.net/health || exit 1
+  #                 displayName: 'Run Smoke Test'
+
+  #               # Rollback on Failure
+  #               - task: AzureCLI@2
+  #                 condition: failed()
+  #                 inputs:
+  #                   azureSubscription: $(azureSubscription)
+  #                   scriptType: 'bash'
+  #                   scriptLocation: 'inlineScript'
+  #                   inlineScript: |
+  #                     echo "Deployment failed! Initiating rollback..."
+  #                     # Rollback logic or previous deployment activation
