@@ -136,53 +136,53 @@ stages:
               npm run integration-test --prefix server || exit 1
             displayName: 'Run Integration Tests'
 
-  # Stage 4: Deployment to Azure App Service
-  - stage: Deployment
-    displayName: 'Deploy to Azure App Services'
-    dependsOn: Testing
-    jobs:
-      - deployment: Deploy
-        displayName: 'Deploy Application'
-        environment: 'production'
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - task: Checkout@1
-                  displayName: 'Checkout Code'
+  # # Stage 4: Deployment to Azure App Service
+  # - stage: Deployment
+  #   displayName: 'Deploy to Azure App Services'
+  #   dependsOn: Testing
+  #   jobs:
+  #     - deployment: Deploy
+  #       displayName: 'Deploy Application'
+  #       environment: 'production'
+  #       strategy:
+  #         runOnce:
+  #           deploy:
+  #             steps:
+  #               - task: Checkout@1
+  #                 displayName: 'Checkout Code'
 
-                - task: AzureWebAppContainer@1
-                  displayName: 'Deploy Frontend to Azure Web App'
-                  inputs:
-                    azureSubscription: $(azureSubscription)
-                    appName: $(azureWebAppName)
-                    deployToSlotOrASE: true
-                    resourceGroupName: 'FPPSO11'
-                    dockerRegistryServiceConnection: $(dockerRegistryServiceConnection)
-                    imageName: $(dockerRepositoryFrontend):$(dockerImageTagFE)
+  #               - task: AzureWebAppContainer@1
+  #                 displayName: 'Deploy Frontend to Azure Web App'
+  #                 inputs:
+  #                   azureSubscription: $(azureSubscription)
+  #                   appName: $(azureWebAppName)
+  #                   deployToSlotOrASE: true
+  #                   resourceGroupName: 'FPPSO11'
+  #                   dockerRegistryServiceConnection: $(dockerRegistryServiceConnection)
+  #                   imageName: $(dockerRepositoryFrontend):$(dockerImageTagFE)
 
-                - task: AzureWebAppContainer@1
-                  displayName: 'Deploy Backend to Azure Web App'
-                  inputs:
-                    azureSubscription: $(azureSubscription)
-                    appName: $(azureWebAppName)
-                    deployToSlotOrASE: true
-                    dockerRegistryServiceConnection: $(dockerRegistryServiceConnection)
-                    imageName: $(dockerRepositoryBackend):$(dockerImageTagBE)
+  #               - task: AzureWebAppContainer@1
+  #                 displayName: 'Deploy Backend to Azure Web App'
+  #                 inputs:
+  #                   azureSubscription: $(azureSubscription)
+  #                   appName: $(azureWebAppName)
+  #                   deployToSlotOrASE: true
+  #                   dockerRegistryServiceConnection: $(dockerRegistryServiceConnection)
+  #                   imageName: $(dockerRepositoryBackend):$(dockerImageTagBE)
 
-                # Smoke Test (Simplified Example)
-                - script: |
-                    echo "Running Smoke Test..."
-                    curl -f https://$(azureWebAppName).azurewebsites.net/health || exit 1
-                  displayName: 'Run Smoke Test'
+  #               # Smoke Test (Simplified Example)
+  #               - script: |
+  #                   echo "Running Smoke Test..."
+  #                   curl -f https://$(azureWebAppName).azurewebsites.net/health || exit 1
+  #                 displayName: 'Run Smoke Test'
 
-                # Rollback on Failure
-                - task: AzureCLI@2
-                  condition: failed()
-                  inputs:
-                    azureSubscription: $(azureSubscription)
-                    scriptType: 'bash'
-                    scriptLocation: 'inlineScript'
-                    inlineScript: |
-                      echo "Deployment failed! Initiating rollback..."
-                      # Rollback logic or previous deployment activation
+  #               # Rollback on Failure
+  #               - task: AzureCLI@2
+  #                 condition: failed()
+  #                 inputs:
+  #                   azureSubscription: $(azureSubscription)
+  #                   scriptType: 'bash'
+  #                   scriptLocation: 'inlineScript'
+  #                   inlineScript: |
+  #                     echo "Deployment failed! Initiating rollback..."
+  #                     # Rollback logic or previous deployment activation
