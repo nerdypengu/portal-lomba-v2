@@ -7,6 +7,7 @@ const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
 const crypto = require("crypto");
 const {Readable} = require("stream");
+const cors = require('cors');
 
 // Load environment variables
 dotenv.config();
@@ -14,6 +15,10 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(cookieParser()); // For cookie parsing
+app.use(cors({
+  origin: "http://localhost:5173",
+  methods: ["GET", "POST","DELETE","UPDATE"],
+}));
 
 // Import the authorization middleware from cookieAuth.js
 const { authorization } = require("./cookieAuth"); // Import the authorization middleware
@@ -300,32 +305,42 @@ app.get("/api/competitions/all", async (req, res) => {
 
   try {
     const sheetNames = await getAllSheetNames(sheetId);
-    let allCompetitionsGroupedByMonth = [];
+    let allCompetitions = [];
 
     for (const sheetName of sheetNames) {
+      if (sheetName === "AUTH") continue;
+
       const response = await sheets.spreadsheets.values.get({
         spreadsheetId: sheetId,
-        range: `${sheetName}!A:I`,
+        range: `${sheetName}!A:K`,
       });
 
       const rows = response.data.values || [];
       const headers = rows[0];
-      const data = rows.slice(1).map(row => {
+      const data = rows.slice(1).map((row) => {
         const competition = {};
         headers.forEach((header, index) => {
-          competition[header] = row[index] || null;
+          let value = row[index] || null;
+
+          if (header === "Image LInk" && value && value.includes("drive.google.com/uc?id=")) {
+            const match = value.match(/id=([a-zA-Z0-9_-]+)/);
+            if (match) {
+              const fileId = match[1];
+              value = `https://drive.google.com/file/d/${fileId}/preview`;
+            }
+          }
+
+          competition[header] = value;
         });
+        competition["month"] = sheetName;
+
         return competition;
       });
 
-      // Using sheetName as the month key
-      const monthKey = `month: ${sheetName}`;
-      allCompetitionsGroupedByMonth.push({
-        [monthKey]: data
-      });
+      allCompetitions.push(...data);
     }
 
-    res.status(200).json({ data: allCompetitionsGroupedByMonth });
+    res.status(200).json({ data: allCompetitions });
   } catch (err) {
     console.error("Error fetching competitions:", err);
     res.status(500).send("Failed to fetch competitions.");
@@ -334,25 +349,28 @@ app.get("/api/competitions/all", async (req, res) => {
 
 
 
-//FETCH DETAIL PER ID
 app.get("/api/competitions/:sheetName/:id", async (req, res) => {
   const { sheetName, id } = req.params;
   const sheetId = "1gpJ7LHMC9vOH8ArfEsO8ixS-y77PKY-M921jGIYjopg";
 
   if (!id || !sheetName) {
-    return res.status(400).send("Missing required parameters: id and sheetName.");
+    return res.status(400).json({ error: "Missing required parameters: id and sheetName." });
+  }
+
+  if (sheetName === "AUTH") {
+    return res.status(400).json({ error: "You don't have access to this file." });
   }
 
   try {
     // Check if the sheetName exists in the spreadsheet
     const sheetNames = await getAllSheetNames(sheetId);
     if (!sheetNames.includes(sheetName)) {
-      return res.status(404).send(`Sheet with name ${sheetName} not found.`);
+      return res.status(404).json({ error: `Sheet with name ${sheetName} not found.` });
     }
 
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: `${sheetName}!A:I`, // Query the specific sheet
+      range: `${sheetName}!A:K`, // Query the specific sheet
     });
 
     const rows = response.data.values || [];
@@ -360,10 +378,10 @@ app.get("/api/competitions/:sheetName/:id", async (req, res) => {
     const data = rows.slice(1);
 
     // Search for the competition in the specified sheet
-    const competition = data.find(row => row[0] === id);
+    const competition = data.find((row) => row[0] === id);
 
     if (!competition) {
-      return res.status(404).send("Competition not found.");
+      return res.status(404).json({ error: "Competition not found." });
     }
 
     const competitionData = {};
@@ -371,12 +389,23 @@ app.get("/api/competitions/:sheetName/:id", async (req, res) => {
       competitionData[header] = competition[index] || null;
     });
 
+    // Transform the Image Link to an embed URL if it matches the Google Drive format
+    if (competitionData["Image LInk"]) {
+      const imageUrl = competitionData["Image LInk"];
+      const match = imageUrl.match(/id=([^&]+)/); // Extract fileId from the URL
+      if (match && match[1]) {
+        const fileId = match[1];
+        competitionData["Image LInk"] = `https://drive.google.com/file/d/${fileId}/preview`;
+      }
+    }
+
     res.status(200).json({ data: competitionData });
   } catch (err) {
     console.error("Error fetching competition by ID and SheetName:", err);
-    res.status(500).send("Failed to fetch competition.");
+    res.status(500).json({ error: "Failed to fetch competition." });
   }
 });
+
 
 
 

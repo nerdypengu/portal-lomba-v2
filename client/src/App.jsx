@@ -5,6 +5,8 @@ import { Navbar, Footer } from "flowbite-react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import HomePage from "./HomePage";
 import CompetitionDetails from "./CompetitionDetails";
+import LoginPage from "./LoginPage";
+import DashboardPage from "./DashboardPage";
 import './App.css';
 
 const App = () => {
@@ -30,7 +32,9 @@ const App = () => {
         <main className="flex-1 p-4">
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/competition-details/:id" element={<CompetitionDetails />} />
+            <Route path="/competition-details/:sheetName/:id" element={<CompetitionDetails />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/dashboard/*" element={<DashboardPage />} />
           </Routes>
         </main>
 
