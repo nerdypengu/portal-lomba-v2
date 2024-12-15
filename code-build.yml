@@ -46,7 +46,7 @@ steps:
     configMode: 'manual'
     cliProjectKey: 'FP-PSO-11_FP-PSO-11_AZPKLNXakXt54pvTXdAs'
     cliProjectName: 'Portal Lomba'
-    cliSources: 'src'
+    cliSources: '.'
 
 # Task analisis (biasanya ada setelahnya)
 - task: SonarQubeAnalyze@7
