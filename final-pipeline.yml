@@ -1,7 +1,7 @@
 trigger: none  # Trigger manual; ubah sesuai kebutuhan
 
 pool:
-  name: devasc-anisa  # Ganti dengan pool sesuai kebutuhan
+  name: devasc-mut  # Ganti dengan pool sesuai kebutuhan
 
 variables:
   # dockerRegistryServiceConnection: 'dockerhub-mut-reg-con'
