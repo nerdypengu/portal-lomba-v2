@@ -44,33 +44,19 @@ steps:
     SonarQube: 'sonar'
     scannerMode: 'cli'
     configMode: 'manual'
-    cliProjectKey: 'FP-PSO-11_FP-PSO-11_AZPKLNXakXt54pvTXdAs'
-    cliProjectName: 'portal-lomba'
-    cliSources: '.'
-    extraProperties: |
-      # Additional properties that will be passed to the scanner, 
-      # Put one key=value per line, example:
-      # sonar.exclusions=**/*.bin
-      sonar.sources=.
-      sonar.java.binaries=target/classes
+    cliProjectKey: 'FP-MyProject'
+    cliProjectName: 'My React Project'
+    cliSources: 'src'
 
-- script: |
-    sonar-scanner
-    displayName: 'Run SonarQube Analysis'
-
-- task: SonarQubePublish@5
-  inputs:
-    pollingTimeoutSec: '300'
-  displayName: 'Publish Quality Gate Result'
-
-
+# Task analisis (biasanya ada setelahnya)
 - task: SonarQubeAnalyze@7
-  inputs:
-    jdkversion: 'JAVA_HOME'
+  displayName: 'Run SonarQube analysis'
 
-- task: SonarQubePublish@7
+# Task publish report ke artifact
+- task: PublishBuildArtifacts@1
   inputs:
-    pollingTimeoutSec: '300'
+    artifactName: 'sonar-report'
+    publishLocation: 'Container'
 
 - task: DockerInstaller@0
   inputs:
