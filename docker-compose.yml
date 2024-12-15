@@ -6,6 +6,7 @@ services:
     build:
       context: ./client  # Path ke direktori frontend
       dockerfile: Dockerfile
+    image: portal-lomba:frontend-latest  # Nama dan tag image
     ports:
       - "80:80"  # Port frontend (nginx) di host
     depends_on:
@@ -16,6 +17,7 @@ services:
     build:
       context: ./server  # Path ke direktori backend
       dockerfile: Dockerfile
+    image: portal-lomba:backend-latest  # Nama dan tag image
     ports:
       - "5000:5000"  # Port backend di host
     environment:
