@@ -47,11 +47,11 @@ steps:
 # Step 5: Push Docker Images (Frontend & Backend)
 - script: |
     echo "Pushing frontend image..."
-    docker tag project-root_frontend:latest moetzie/portal-lomba:frontend-latest
+    docker tag portal-lomba:frontend-latest moetzie/portal-lomba:frontend-latest
     docker push moetzie/portal-lomba:frontend-latest
 
     echo "Pushing backend image..."
-    docker tag project-root_backend:latest moetzie/portal-lomba:backend-latest
+    docker portal-lomba:backend-latest moetzie/portal-lomba:backend-latest
     docker push moetzie/portal-lomba:backend-latest
   displayName: 'Tag and Push Docker Images'
 
