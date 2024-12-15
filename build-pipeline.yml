@@ -47,7 +47,7 @@ steps:
 - task: Docker@2
   inputs:
     containerRegistry: 'dockerhub-mut-reg-con'
-    repository: 'moetzie/portal-lomba-frontend'
+    repository: 'moetzie/portal-lomba'
     command: 'buildAndPush'
     Dockerfile: 'client/Dockerfile' # Path to client Dockerfile
     tags: 'latest'
@@ -56,7 +56,7 @@ steps:
 - task: Docker@2
   inputs:
     containerRegistry: 'dockerhub-mut-reg-con'
-    repository: 'moetzie/portal-lomba-backend'
+    repository: 'moetzie/portal-lomba'
     command: 'buildAndPush'
     Dockerfile: 'server/Dockerfile' # Path to server Dockerfile
     tags: 'latest'
