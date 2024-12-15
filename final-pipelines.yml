@@ -9,7 +9,7 @@ variables:
   dockerRepositoryBackend: 'moetzie/portal-lomba'
   dockerImageTagFE: 'frontend-latest'
   dockerImageTagBE: 'backend-latest'
-  azureSubscription: 'mutresource'
+  azureSubscription: 'resourcemut'
   azureWebAppName: 'portal-lomba'
 
 stages:
