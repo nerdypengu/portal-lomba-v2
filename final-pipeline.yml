@@ -3,22 +3,6 @@ trigger: none  # Trigger manual; ubah sesuai kebutuhan
 pool:
   name: devasc-mut  # Ganti dengan pool sesuai kebutuhan
 
-variables:
-  - name: dockerRegistryServiceConnection
-    value: 'dockerhub-mut-reg-con'
-  - name: dockerRepositoryFrontend
-    value: 'moetzie/portal-lomba'
-  - name: dockerRepositoryBackend
-    value: 'moetzie/portal-lomba'
-  - name: dockerImageTagFE
-    value: 'frontend-latest'
-  - name: dockerImageTagBE
-    value: 'backend-latest'
-  - name: azureSubscription
-    value: 'resourcemut'
-  - name: azureWebAppName
-    value: 'portal-lomba'
-
 stages:
   # Stage 1: Code Quality
   - stage: CodeQuality
@@ -81,26 +65,26 @@ stages:
             displayName: 'Login to Docker Hub'
             inputs:
               command: 'login'
-              containerRegistry: $(dockerRegistryServiceConnection)
+              containerRegistry: 'dockerhub-mut-reg-con'
 
           # Build and Push Frontend Image
           - task: Docker@2
             inputs:
-              containerRegistry: $(dockerRegistryServiceConnection)
-              repository: $(dockerRepositoryFrontend)
+              containerRegistry: 'dockerhub-mut-reg-con'
+              repository: 'moetzie/portal-lomba'
               command: 'buildAndPush'
               Dockerfile: 'client/Dockerfile'
-              tags: $(dockerImageTagFE)
+              tags: 'frontend-latest'
             displayName: 'Build and Push Frontend Image'
 
           # Build and Push Backend Image
           - task: Docker@2
             inputs:
-              containerRegistry: $(dockerRegistryServiceConnection)
-              repository: $(dockerRepositoryBackend)
+              containerRegistry: 'dockerhub-mut-reg-con'
+              repository: 'moetzie/portal-lomba'
               command: 'buildAndPush'
               Dockerfile: 'server/Dockerfile'
-              tags: $(dockerImageTagBE)
+              tags: 'backend-latest'
             displayName: 'Build and Push Backend Image'
 
   # Stage 3: Testing
