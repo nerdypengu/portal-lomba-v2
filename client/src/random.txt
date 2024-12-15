@@ -1,0 +1,9 @@
+ // const [competitions, setCompetitions] = useState([]);
+
+  // useEffect(() => {
+  //   // Fetch competitions from the server
+  //   fetch("http://localhost:8080/api/competitions")
+  //     .then((response) => response.json())
+  //     .then((data) => setCompetitions(data))
+  //     .catch((error) => console.error("Error fetching competitions:", error));
+  // }, []);
