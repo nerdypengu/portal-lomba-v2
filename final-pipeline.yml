@@ -1,7 +1,17 @@
 trigger: none  # Trigger manual; ubah sesuai kebutuhan
 
 pool:
-  name: devasc-anisa  # Ganti dengan pool sesuai kebutuhan
+  name: devasc-mut  # Ganti dengan pool sesuai kebutuhan
+
+variables:
+  # dockerRegistryServiceConnection: 'dockerhub-mut-reg-con'
+  # dockerRepositoryFrontend: 'moetzie/portal-lomba'
+  # dockerRepositoryBackend: 'moetzie/portal-lomba'
+  # dockerImageTagFE: 'frontend-latest'
+  # dockerImageTagBE: 'backend-latest'
+  # azureSubscription: 'resourcemut'
+  # azureWebAppName: 'portal-lomba'
+  - group: FP-PSO11
 
 stages:
   # Stage 1: Code Quality
@@ -62,33 +72,30 @@ stages:
             displayName: 'Install and Build Frontend'
 
           - task: Docker@2
-            displayName: Login to Docker Hub
+            displayName: 'Login to Docker Hub'
             inputs:
               command: 'login'
-              containerRegistry: 'dockerhub-mut-reg-con'
+              containerRegistry: $(dockerRegistryServiceConnection)
 
-          # Step 3: Build and Push Docker Images
+          # Build and Push Frontend Image
           - task: Docker@2
             inputs:
-              containerRegistry: 'dockerhub-mut-reg-con'
-              repository: 'moetzie/portal-lomba'
+              containerRegistry: $(dockerRegistryServiceConnection)
+              repository: $(dockerRepositoryFrontend)
               command: 'buildAndPush'
-              Dockerfile: 'client/Dockerfile' # Path to client Dockerfile
-              tags: 'latest'
+              Dockerfile: 'client/Dockerfile'
+              tags: $(dockerImageTagFE)
+            displayName: 'Build and Push Frontend Image'
 
+          # Build and Push Backend Image
           - task: Docker@2
             inputs:
-              containerRegistry: 'dockerhub-mut-reg-con'
-              repository: 'moetzie/portal-lomba'
+              containerRegistry: $(dockerRegistryServiceConnection)
+              repository: $(dockerRepositoryBackend)
               command: 'buildAndPush'
-              Dockerfile: 'server/Dockerfile' # Path to server Dockerfile
-              tags: 'latest'
-
-          - task: PublishBuildArtifacts@1
-            inputs:
-              #PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-              ArtifactName: 'drop'
-              publishLocation: 'Container'
+              Dockerfile: 'server/Dockerfile'
+              tags: $(dockerImageTagBE)
+            displayName: 'Build and Push Backend Image'
 
   # Stage 3: Testing
   - stage: Testing
