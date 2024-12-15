@@ -7,6 +7,14 @@ variables:
   composeFile: 'docker-compose.yml'
 
 steps:
+# Step 1: Install Docker Compose
+- script: |
+    echo "Installing Docker Compose..."
+    sudo curl -L "https://github.com/docker/compose/releases/download/v2.26.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    sudo chmod +x /usr/local/bin/docker-compose
+    docker-compose --version
+  displayName: 'Install Docker Compose'
+
 # Step 1: Install Node.js (jika diperlukan untuk linting/test)
 - task: NodeTool@0
   inputs:
