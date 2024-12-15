@@ -1,0 +1,69 @@
+trigger: none
+
+pool:
+  name: devasc-anisa
+
+stages:
+# Stage untuk Code Quality (ESLint, SonarQube)
+- stage: CodeQuality
+  jobs:
+    - job: CodeQualityCheck
+      steps:
+      # Checkout code dari repository GitHub
+      - task: Checkout@1
+        inputs:
+          repository: 'self'
+          clean: true
+
+      # Setup Node.js
+      - task: NodeTool@0
+        displayName: 'Install Node.js'
+        inputs:
+          versionSpec: '20.x'
+
+      # Install dependencies
+      - script: |
+          npm install
+        displayName: 'Install Dependencies'
+
+      # Install dependencies
+      - script: |
+          npm audit
+        displayName: 'Install Dependencies'
+
+      # Linting dengan fix
+      - script: |
+          - script: |
+          npx eslint --config client/eslint.config.js client --fix --format json -o eslint-report.json
+        displayName: 'Run ESLint with Fix and Report'
+      
+      # Publish report
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: 'eslint-report.json'
+          ArtifactName: 'ESLint Report'
+        displayName: 'Publish ESLint Report'
+
+- stage: Build
+  jobs:
+    - job: Build
+      steps:
+      - task: DockerInstaller@0
+        inputs:
+          dockerVersion: '17.09.0-ce'
+
+      - task: Docker@2
+        inputs:
+          containerRegistry: 'docker'
+          repository: 'anisarahmah/react'
+          command: 'buildAndPush'
+          Dockerfile: '**/Dockerfile'
+          tags: 'portal-lomba'
+          addPipelineData: false
+          addBaseImageData: false
+      
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
