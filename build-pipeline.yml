@@ -7,7 +7,7 @@ pool:
   name: devasc-mut
 
 variables:
-  frontendBuildDir: 'client/build' # Adjust if the frontend build directory differs
+  frontendBuildDir: 'client' # Adjust if the frontend build directory differs
   backendBuildDir: 'server'       # Adjust if the backend build directory differs
 
 steps:
