@@ -43,27 +43,6 @@ stages:
           PathtoPublish: 'eslint-report.json'
           ArtifactName: 'ESLint Report'
         displayName: 'Publish ESLint Report'
-      
-      - task: SonarQubePrepare@7
-        inputs:
-          SonarQube: 'sonar'
-          scannerMode: 'cli'
-          configMode: 'manual'
-          cliProjectKey: 'FP-PSO-11_FP-PSO-11_AZPKLNXakXt54pvTXdAs'
-          cliProjectName: 'Portal Lomba'
-          cliSources: '.'
-          extraProperties: |
-            sonar.sources=.
-            sonar.exclusions=**/*.test.js
-            sonar.javascript.lcov.reportPaths=coverage/lcov-report/lcov.info
-
-      # Jalankan SonarQube langsung tanpa build
-      - task: SonarQubeAnalyze@7
-        displayName: 'Run SonarQube analysis'
-
-      # Publish hasil analisis
-      - task: SonarQubePublish@7
-        displayName: 'Publish SonarQube Report'
 
 - stage: Build
   jobs:
