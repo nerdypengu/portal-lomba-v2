@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  portallombav2:
+    image: portallombav2
+    build:
+      context: .
+      dockerfile: ./Dockerfile
