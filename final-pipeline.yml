@@ -27,7 +27,7 @@ stages:
           - task: NodeTool@0
             displayName: 'Install Node.js'
             inputs:
-              versionSpec: '18.x'
+              versionSpec: '20.x'
 
           - script: |
               echo "Installing Dependencies..."
@@ -61,7 +61,7 @@ stages:
           - task: NodeTool@0
             displayName: 'Install Node.js'
             inputs:
-              versionSpec: '18.x'
+              versionSpec: '20.x'
 
           - script: |
               echo "Installing Frontend and Backend Dependencies..."
@@ -111,7 +111,7 @@ stages:
           - task: NodeTool@0
             displayName: 'Install Node.js'
             inputs:
-              versionSpec: '18.x'
+              versionSpec: '20.x'
 
           - script: |
               echo "Installing Dependencies..."
