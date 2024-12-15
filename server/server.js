@@ -17,7 +17,8 @@ app.use(express.json());
 app.use(cookieParser()); // For cookie parsing
 app.use(cors({
   origin: "http://localhost:5173",
-  methods: ["GET", "POST","DELETE","UPDATE"],
+  methods: ["GET", "POST","DELETE","PUT"],
+  credentials: true,
 }));
 
 // Import the authorization middleware from cookieAuth.js
@@ -78,27 +79,25 @@ app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Fetch user by email
     const user = await fetchUser(email);
     if (!user) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // Hash the entered password with SHA-256
     const hashedInputPassword = hashPasswordWithSHA256(password);
 
-    // Compare entered hashed password with stored hashed password
     if (hashedInputPassword !== user.hashedPassword) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // Generate a JWT token
     const token = jwt.sign({ email: user.email }, SECRET_KEY, { expiresIn: "1h" });
 
-    // Set the token as a cookie (httpOnly for security)
-    res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production" });
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Make sure it's true in production
+      sameSite: "Strict", // Ensure the cookie is sent with requests
+    });
 
-    // Respond with a success message
     return res.status(200).json({ message: "Login successful" });
   } catch (error) {
     return res.status(500).json({ message: "An error occurred", error: error.message });
@@ -235,14 +234,15 @@ async function insertCompetitionData(
 //CREATE COMPETITION
 app.post("/api/competitions", authorization, upload.single("image"), async (req, res) => {
   const {
-    sheetId,
-    sheetName,
     name,
     startRegistDate,
     endRegistDate,
     tags,
     desc,
   } = req.body;
+
+  const sheetId = "1gpJ7LHMC9vOH8ArfEsO8ixS-y77PKY-M921jGIYjopg";
+  const sheetName = "Januari";
 
   if (
     !sheetId ||
@@ -411,9 +411,10 @@ app.get("/api/competitions/:sheetName/:id", async (req, res) => {
 
 
 //Update Competition Data
-app.put("/api/competitions/:sheetId/:sheetName/:id", upload.single("image"), async (req, res) => {
-  const { sheetId, sheetName, id } = req.params;
+app.put("/api/competitions/:sheetName/:id", upload.single("image"), async (req, res) => {
+  const { sheetName, id } = req.params;
   const { name, startRegistDate, endRegistDate, tags, desc } = req.body;
+  const sheetId = "1gpJ7LHMC9vOH8ArfEsO8ixS-y77PKY-M921jGIYjopg"; 
 
   if (!sheetId || !sheetName || !id) {
     return res.status(400).send("Missing required fields (sheetId, sheetName, id).");
@@ -422,7 +423,7 @@ app.put("/api/competitions/:sheetId/:sheetName/:id", upload.single("image"), asy
   try {
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: `${sheetName}!A:I`,
+      range: `${sheetName}!A:K`,
     });
 
     const rows = response.data.values || [];
@@ -514,8 +515,9 @@ async function deleteOldImage(imageId) {
 
 
 // DELETE COMPETITION
-app.delete("/api/competitions/:sheetId/:sheetName/:id", async (req, res) => {
-  const { sheetId, sheetName, id } = req.params;
+app.delete("/api/competitions/:sheetName/:id", async (req, res) => {
+  const { sheetName, id } = req.params;
+  const sheetId = "1gpJ7LHMC9vOH8ArfEsO8ixS-y77PKY-M921jGIYjopg"; 
 
   if (!sheetId || !sheetName || !id) {
     return res.status(400).send("Missing required fields (sheetId, sheetName, id).");
