@@ -51,7 +51,7 @@ steps:
     docker push moetzie/portal-lomba:frontend-latest
 
     echo "Pushing backend image..."
-    docker portal-lomba:backend-latest moetzie/portal-lomba:backend-latest
+    docker tag portal-lomba:backend-latest moetzie/portal-lomba:backend-latest
     docker push moetzie/portal-lomba:backend-latest
   displayName: 'Tag and Push Docker Images'
 
