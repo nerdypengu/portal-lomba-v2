@@ -3,7 +3,10 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-trigger: none
+trigger:
+  branches:
+    include:
+      - main
 
 pool:
   name: devasc-anisa
@@ -11,8 +14,8 @@ pool:
 steps:
   - checkout: self
     persistCredentials: true
-    fetchDepth: 1
-    clean: true
+    fetchDepth: 1  # Hanya ambil commit terbaru
+    clean: true  
 
   - task: SonarQubePrepare@7
     inputs:
