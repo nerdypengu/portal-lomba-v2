@@ -6,6 +6,11 @@
   "scripts": {
     "test": "jest --ci --coverage", 
     "lint": "eslint .", 
+    "jest": {
+              "collectCoverage": true,
+              "coverageReporters": ["cobertura", "html"],
+              "coverageDirectory": "coverage"
+              },
     "start": "node server.js",
     "dev": "env-cmd -f .env.development nodemon server.js"
   },
