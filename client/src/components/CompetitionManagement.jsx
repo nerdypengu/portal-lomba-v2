@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button, TextInput, Modal } from "flowbite-react";
 
 const CompetitionsManagement = () => {
@@ -40,11 +40,11 @@ const CompetitionsManagement = () => {
     uploadImage: modalData.image || null, // Adjust if you handle file uploads
   });
 
-  const fetchCompetitions = async () => {
+  const fetchCompetitions = useCallback(async () => {
     try {
       const response = await fetch("http://localhost:8080/api/competitions/all");
       const result = await response.json();
-
+  
       if (response.ok) {
         const mappedData = result.data.map(mapResponseToModalData);
         setCompetitions(mappedData);
@@ -54,7 +54,9 @@ const CompetitionsManagement = () => {
     } catch (err) {
       console.error("Error:", err);
     }
-  };
+   
+  }, [setCompetitions]);
+  
 
   const handleAdd = async () => {
     try {
@@ -147,7 +149,7 @@ const CompetitionsManagement = () => {
 
   useEffect(() => {
     fetchCompetitions();
-  }, []);
+  }, [fetchCompetitions]);
 
   return (
     <div className="p-4">
