@@ -10,5 +10,5 @@ RUN npm run build
 FROM nginx:1.21-alpine
 # Update this path to reflect the correct Vite output directory
 COPY --from=builder /app/dist /usr/share/nginx/html
-EXPOSE 80
+EXPOSE 5173
 CMD ["nginx", "-g", "daemon off;"]
