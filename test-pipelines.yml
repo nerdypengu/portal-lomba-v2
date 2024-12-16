@@ -4,7 +4,7 @@ trigger: none
 #     - main
 
 pool:
-  name: karina
+  name: devasc-mut
 
 variables:
   frontendTestDir: 'client'   # Path to frontend code
