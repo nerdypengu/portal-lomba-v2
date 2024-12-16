@@ -46,7 +46,7 @@ stages:
 
       - task: SonarQubePrepare@7
         inputs:
-          SonarQube: 'sonar'
+          SonarQube: 'SonarQube'
           scannerMode: 'cli'
           configMode: 'manual'
           cliProjectKey: 'FP-PSO-11_FP-PSO-11_AZPKLNXakXt54pvTXdAs'
