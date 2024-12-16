@@ -1,0 +1,13 @@
+{
+  "name": "portal-lomba-v2",
+  "version": "1.0.0",
+  "scripts": {
+    "install": "npm install --prefix client && npm install --prefix server",
+    "start": "concurrently \"npm run start-client\" \"npm run start-server\"",
+    "start-client": "npm --prefix client run dev",
+    "start-server": "node server/server.js"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
