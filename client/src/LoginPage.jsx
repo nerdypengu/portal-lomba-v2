@@ -2,34 +2,38 @@
 
 import React, { useState } from "react";
 import { Button, TextInput, Alert } from "flowbite-react";
+import { useNavigate } from "react-router-dom"; // for navigation after login
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
+  const navigate = useNavigate(); // Initialize the navigate function from react-router
 
   const handleLogin = async () => {
     setError(null);
     setShowErrorNotification(false);
-  
+
     try {
       const response = await fetch("http://localhost:8080/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email: username, password })
+        body: JSON.stringify({ email: username, password }),
+        credentials: "include", // Make sure cookies are included in cross-origin requests
       });
-  
+
       const result = await response.json();
-  
+
       if (response.ok) {
         // Handle successful login
         alert("Login successful");
         console.log("Server Response:", result);
-  
-       
+
+        // Redirect to the dashboard after successful login
+        navigate("/dashboard");
       } else {
         // Handle login error from the API response
         setError(result.message || "Login failed. Please try again.");
