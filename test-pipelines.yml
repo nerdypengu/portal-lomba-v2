@@ -6,16 +6,11 @@ trigger: none
 pool:
   name: karina
 
-variables:
-  frontendTestDir: 'client'   # Path to frontend code
-  backendTestDir: 'server'    # Path to backend code
-  nodeVersion: '20.x'         # Node.js version
-
 steps:
 # Step 1: Install Node.js
 - task: NodeTool@0
   inputs:
-    versionSpec: $(nodeVersion)
+    versionSpec: $20.x
   displayName: 'Install Node.js'
 
 # Step 2: Checkout Source Code
@@ -25,35 +20,35 @@ steps:
 # Step 3: Install Frontend Dependencies
 - script: |
     echo Installing frontend dependencies...
-    cd $(frontendTestDir)
+    cd $client
     npm install
   displayName: 'Install Frontend Dependencies'
 
 # Step 4: Run Frontend Unit Tests
 - script: |
     echo Running frontend unit tests...
-    cd $(frontendTestDir)
+    cd $client
     npm run test -- --ci --coverage
   displayName: 'Run Frontend Unit Tests'
 
 # Step 5: Install Backend Dependencies
 - script: |
     echo "Installing backend dependencies..."
-    cd $(backendTestDir)
+    cd $server
     npm install
   displayName: 'Install Backend Dependencies'
 
 # Step 6: Run ESLint for Backend
 - script: |
     echo "Running ESLint for backend..."
-    cd $(backendTestDir)
+    cd $server
     npm run lint
   displayName: 'Run ESLint (Backend)'
 
 # Step 7: Run Backend Unit Tests
 - script: |
     echo "Running Jest tests for backend..."
-    cd $(backendTestDir)
+    cd $server
     npm run test -- --ci --coverage
   displayName: 'Run Jest Tests (Backend)'
 
@@ -70,5 +65,5 @@ steps:
 - task: PublishCodeCoverageResults@1
   inputs:
     codeCoverageTool: 'Cobertura'
-    summaryFileLocation: '$(System.DefaultWorkingDirectory)/$(backendTestDir)/coverage/cobertura-coverage.xml'
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/$server/coverage/cobertura-coverage.xml'
   displayName: 'Publish Backend Code Coverage'
