@@ -1,0 +1,76 @@
+trigger: none
+# branches:
+#   include:
+#     - main
+
+pool:
+  name: devasc-mut
+
+variables:
+  frontendTestDir: 'client'   # Path to frontend code
+  backendTestDir: 'server'    # Path to backend code
+  nodeVersion: '20.x'         # Node.js version
+
+steps:
+# Step 1: Install Node.js
+- task: NodeTool@0
+  inputs:
+    versionSpec: $(nodeVersion)
+  displayName: 'Install Node.js'
+
+# Step 2: Checkout Source Code
+- task: Checkout@1
+  displayName: 'Checkout Source Code'
+
+# Step 3: Install Frontend Dependencies
+- script: |
+    echo Installing frontend dependencies...
+    cd $(frontendTestDir)
+    npm install
+  displayName: 'Install Frontend Dependencies'
+
+# Step 4: Run Frontend Unit Tests
+- script: |
+    echo Running frontend unit tests...
+    cd $(frontendTestDir)
+    npm run test -- --ci --coverage
+  displayName: 'Run Frontend Unit Tests'
+
+# Step 5: Install Backend Dependencies
+- script: |
+    echo Installing backend dependencies...
+    cd $(backendTestDir)
+    npm install
+  displayName: 'Install Backend Dependencies'
+
+# Step 6: Run Backend Unit Tests
+- script: |
+    echo Running backend unit tests...
+    cd $(backendTestDir)
+    npm run test -- --ci --coverage
+  displayName: 'Run Backend Unit Tests'
+
+# Step 7: Run ESLint (Code Quality Check)
+- script: |
+    echo Running ESLint...
+    cd $(frontendTestDir)
+    npm run lint
+    cd ../$(backendTestDir)
+    npm run lint
+  displayName: 'Run ESLint Code Quality Check'
+
+# Step 8: Publish Test Results
+- task: PublishTestResults@2
+  inputs:
+    testResultsFiles: '**/test-results.xml'
+    mergeTestResults: true
+    testRunTitle: 'Unit and Lint Tests'
+  condition: succeededOrFailed()
+  displayName: 'Publish Test Results'
+
+# Step 9: Publish Code Coverage Report
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: 'Cobertura'
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage/cobertura-coverage.xml'
+  displayName: 'Publish Code Coverage Results'
