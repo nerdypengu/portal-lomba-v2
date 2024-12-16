@@ -10,7 +10,7 @@ steps:
 # Step 1: Install Node.js
 - task: NodeTool@0
   inputs:
-    versionSpec: $20.x
+    versionSpec: $22.x
   displayName: 'Install Node.js'
 
 # Step 2: Checkout Source Code
