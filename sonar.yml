@@ -3,10 +3,7 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-trigger:
-  branches:
-    include:
-      - main
+trigger: none
 
 pool:
   name: devasc-anisa
@@ -19,7 +16,7 @@ steps:
 
   - task: SonarQubePrepare@7
     inputs:
-      SonarQube: 'sonar'
+      SonarQube: 'SonarQube'
       scannerMode: 'cli'
       configMode: 'manual'
       cliProjectKey: 'FP-PSO-11_FP-PSO-11_AZPKLNXakXt54pvTXdAs'
