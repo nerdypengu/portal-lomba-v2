@@ -38,39 +38,37 @@ steps:
 
 # Step 5: Install Backend Dependencies
 - script: |
-    echo Installing backend dependencies...
+    echo "Installing backend dependencies..."
     cd $(backendTestDir)
     npm install
   displayName: 'Install Backend Dependencies'
 
-# Step 6: Run Backend Unit Tests
+# Step 6: Run ESLint for Backend
 - script: |
-    echo Running backend unit tests...
+    echo "Running ESLint for backend..."
+    cd $(backendTestDir)
+    npm run lint
+  displayName: 'Run ESLint (Backend)'
+
+# Step 7: Run Backend Unit Tests
+- script: |
+    echo "Running Jest tests for backend..."
     cd $(backendTestDir)
     npm run test -- --ci --coverage
-  displayName: 'Run Backend Unit Tests'
-
-# Step 7: Run ESLint (Code Quality Check)
-- script: |
-    echo Running ESLint...
-    cd $(frontendTestDir)
-    npm run lint
-    cd ../$(backendTestDir)
-    npm run lint
-  displayName: 'Run ESLint Code Quality Check'
+  displayName: 'Run Jest Tests (Backend)'
 
 # Step 8: Publish Test Results
 - task: PublishTestResults@2
   inputs:
-    testResultsFiles: '**/test-results.xml'
+    testResultsFiles: '**/test-results.xml'  # Ensure Jest outputs XML results
     mergeTestResults: true
-    testRunTitle: 'Unit and Lint Tests'
+    testRunTitle: 'Backend Test Results'
   condition: succeededOrFailed()
-  displayName: 'Publish Test Results'
+  displayName: 'Publish Backend Test Results'
 
 # Step 9: Publish Code Coverage Report
 - task: PublishCodeCoverageResults@1
   inputs:
     codeCoverageTool: 'Cobertura'
-    summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage/cobertura-coverage.xml'
-  displayName: 'Publish Code Coverage Results'
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/$(backendTestDir)/coverage/cobertura-coverage.xml'
+  displayName: 'Publish Backend Code Coverage'
