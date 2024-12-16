@@ -7,9 +7,12 @@ pool:
   name: devasc-mut
 
 variables:
-  frontendTestDir: 'client'   # Path to frontend code
-  backendTestDir: 'server'    # Path to backend code
-  nodeVersion: '20.x'         # Node.js version
+  - name: frontendTestDir
+    value: 'client'   # Path to frontend code
+  - name: backendTestDir
+    value: 'server'    # Path to backend code
+  - name: nodeVersion
+    value: '20.x'         # Node.js version
 
 steps:
 # Step 1: Install Node.js
