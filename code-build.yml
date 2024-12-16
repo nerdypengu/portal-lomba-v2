@@ -10,10 +10,10 @@ stages:
     - job: CodeQualityCheck
       steps:
       # Checkout code dari repository GitHub
-      - task: Checkout@1
-        inputs:
-          repository: 'self'
-          clean: true
+      - checkout: self
+        persistCredentials: true
+        fetchDepth: 1
+        clean: true
 
       # Setup Node.js
       - task: NodeTool@0
@@ -43,6 +43,28 @@ stages:
           PathtoPublish: 'eslint-report.json'
           ArtifactName: 'ESLint Report'
         displayName: 'Publish ESLint Report'
+
+      - task: SonarQubePrepare@7
+        inputs:
+          SonarQube: 'sonar'
+          scannerMode: 'cli'
+          configMode: 'manual'
+          cliProjectKey: 'FP-PSO-11_FP-PSO-11_AZPKLNXakXt54pvTXdAs'
+          cliProjectName: 'Portal Lomba'
+          cliSources: '.'
+          extraProperties: |
+            # Additional properties that will be passed to the scanner, 
+            # Put one key=value per line, example:
+            # sonar.exclusions=**/*.bin
+            sonar.java.binaries=.
+
+      - task: SonarQubeAnalyze@7
+        inputs:
+          jdkversion: 'JAVA_HOME'
+
+      - task: SonarQubePublish@7
+        inputs:
+          pollingTimeoutSec: '300'
 
 - stage: Build
   jobs:
