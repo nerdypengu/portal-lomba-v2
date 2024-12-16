@@ -12,5 +12,5 @@ RUN npm install
 COPY . .
 
 # Step 5: Expose the required port and run the server
-EXPOSE 5000
+EXPOSE 8080
 CMD ["node", "server.js"]
