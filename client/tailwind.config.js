@@ -1,10 +1,8 @@
-const flowbite = require("flowbite-react/tailwind");
+import { content as _content, plugin } from "flowbite-react/tailwind";
 
 /** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: ["src/**/*.{js,jsx,ts,tsx}",flowbite.content()],
-  theme: {
-    extend: {},
-  },
-  plugins: [flowbite.plugin()],
-}
+export const content = ["src/**/*.{js,jsx,ts,tsx}", _content()];
+export const theme = {
+  extend: {},
+};
+export const plugins = [plugin()];

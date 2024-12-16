@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const Sidebar = ({ isSidebarVisible, toggleSidebar }) => {
   return (
@@ -26,7 +26,7 @@ const Sidebar = ({ isSidebarVisible, toggleSidebar }) => {
           className="absolute top-1/2 transform -translate-y-1/2 text-gray-700 hover:text-gray-900 focus:outline-none text-3xl"
           style={{
             left: isSidebarVisible ? "auto" : "50%",
-            right: isSidebarVisible ? "1rem" : "auto",  // Adjusted to move more to the right when expanded
+            right: isSidebarVisible ? "1rem" : "auto",
             transform: isSidebarVisible ? "translateY(-50%)" : "translateX(-50%) translateY(-50%)",
           }}
         >
@@ -61,6 +61,12 @@ const Sidebar = ({ isSidebarVisible, toggleSidebar }) => {
       </nav>
     </div>
   );
+};
+
+// Add PropTypes validation
+Sidebar.propTypes = {
+  isSidebarVisible: PropTypes.bool.isRequired,
+  toggleSidebar: PropTypes.func.isRequired,
 };
 
 export default Sidebar;

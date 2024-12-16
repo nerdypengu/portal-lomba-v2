@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button, TextInput, Alert } from "flowbite-react";
 import { useNavigate } from "react-router-dom"; // for navigation after login
 
