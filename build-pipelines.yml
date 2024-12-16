@@ -47,19 +47,19 @@ steps:
 - task: Docker@2
   inputs:
     containerRegistry: 'dockerhub-mut-reg-con'
-    repository: 'moetzie/portal-lomba'
+    repository: 'moetzie/portal-lomba-frontend'
     command: 'buildAndPush'
     Dockerfile: 'client/Dockerfile' # Path to client Dockerfile
-    tags: 'frontend-latest'
+    tags: 'latest'
 
 # Step 6: Build and Push Docker Images (Backend)
 - task: Docker@2
   inputs:
     containerRegistry: 'dockerhub-mut-reg-con'
-    repository: 'moetzie/portal-lomba'
+    repository: 'moetzie/portal-lomba-backend'
     command: 'buildAndPush'
     Dockerfile: 'server/Dockerfile' # Path to server Dockerfile
-    tags: 'backend-latest'
+    tags: 'latest'
 
 # Step 7: Publish Build Artifacts
 - task: PublishBuildArtifacts@1
