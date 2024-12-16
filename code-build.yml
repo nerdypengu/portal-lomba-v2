@@ -49,14 +49,9 @@ stages:
           SonarQube: 'SonarQube'
           scannerMode: 'cli'
           configMode: 'manual'
-          cliProjectKey: 'FP-PSO-11_FP-PSO-11_AZPKLNXakXt54pvTXdAs'
-          cliProjectName: 'Portal Lomba'
+          cliProjectKey: 'Portal-lomba'
+          cliProjectName: 'portal'
           cliSources: '.'
-          extraProperties: |
-            # Additional properties that will be passed to the scanner, 
-            # Put one key=value per line, example:
-            # sonar.exclusions=**/*.bin
-            sonar.java.binaries=.
 
       - task: SonarQubeAnalyze@7
         inputs:
