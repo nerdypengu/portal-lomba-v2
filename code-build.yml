@@ -55,6 +55,7 @@ stages:
       - task: SonarQubeAnalyze@7
         inputs:
           jdkversion: 'JAVA_HOME'
+          options: '-X'
 
       - task: SonarQubePublish@7
         inputs:
