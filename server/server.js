@@ -588,6 +588,13 @@ app.delete("/api/competitions/:sheetName/:id", async (req, res) => {
   }
 });
 
-app.listen(8080, () => {
-  console.log("Server started on port 8080");
+// app.listen(8080, () => {
+//   console.log("Server started on port 8080");
+// });
+
+app.get("/", async (req, res) => {
+  res.status(200).json({ message: "Server is running" });
 });
+
+module.exports = app;
+
