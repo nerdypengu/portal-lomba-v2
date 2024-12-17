@@ -1,0 +1,69 @@
+trigger: none
+# branches:
+#   include:
+#     - main
+
+pool:
+  name: karina
+
+steps:
+# Step 1: Install Node.js
+- task: NodeTool@0
+  inputs:
+    versionSpec: $22.x
+  displayName: 'Install Node.js'
+
+# Step 2: Checkout Source Code
+- task: Checkout@1
+  displayName: 'Checkout Source Code'
+
+# Step 3: Install Frontend Dependencies
+- script: |
+    echo Installing frontend dependencies...
+    cd $client
+    npm install
+  displayName: 'Install Frontend Dependencies'
+
+# Step 4: Run Frontend Unit Tests
+- script: |
+    echo Running frontend unit tests...
+    cd $client
+    npm run test -- --ci --coverage
+  displayName: 'Run Frontend Unit Tests'
+
+# Step 5: Install Backend Dependencies
+- script: |
+    echo "Installing backend dependencies..."
+    cd $server
+    npm install
+  displayName: 'Install Backend Dependencies'
+
+# Step 6: Run ESLint for Backend
+- script: |
+    echo "Running ESLint for backend..."
+    cd $server
+    npm run lint
+  displayName: 'Run ESLint (Backend)'
+
+# Step 7: Run Backend Unit Tests
+- script: |
+    echo "Running Jest tests for backend..."
+    cd $server
+    npm run test -- --ci --coverage
+  displayName: 'Run Jest Tests (Backend)'
+
+# Step 8: Publish Test Results
+- task: PublishTestResults@2
+  inputs:
+    testResultsFiles: '**/test-results.xml'  # Ensure Jest outputs XML results
+    mergeTestResults: true
+    testRunTitle: 'Backend Test Results'
+  condition: succeededOrFailed()
+  displayName: 'Publish Backend Test Results'
+
+# Step 9: Publish Code Coverage Report
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: 'Cobertura'
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/$server/coverage/cobertura-coverage.xml'
+  displayName: 'Publish Backend Code Coverage'

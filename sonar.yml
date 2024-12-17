@@ -1,0 +1,37 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger: none
+
+pool:
+  name: devasc-anisa
+
+steps:
+  - checkout: self
+    persistCredentials: true
+    fetchDepth: 1  # Hanya ambil commit terbaru
+    clean: true  
+
+  - task: SonarQubePrepare@7
+    inputs:
+      SonarQube: 'SonarQube'
+      scannerMode: 'cli'
+      configMode: 'manual'
+      cliProjectKey: 'FP-PSO-11_FP-PSO-11_AZPKLNXakXt54pvTXdAs'
+      cliProjectName: 'Portal Lomba'
+      cliSources: 'client/src'
+      extraProperties: |
+        # Additional properties that will be passed to the scanner, 
+        # Put one key=value per line, example:
+        # sonar.exclusions=**/*.bin
+        sonar.java.binaries=.
+  
+  - task: SonarQubeAnalyze@7
+    inputs:
+      jdkversion: 'JAVA_HOME_17_X64'
+
+  - task: SonarQubePublish@7
+    inputs:
+      pollingTimeoutSec: '300'
