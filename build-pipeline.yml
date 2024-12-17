@@ -19,11 +19,16 @@ steps:
 
 # Step 2: Install dependencies and build
 - script: |
-    echo Installing dependencies...
-    npm install
-    echo Building frontend...
+    echo "Cleaning node_modules..."
+    rm -rf client/node_modules server/node_modules
+
+    echo "Installing dependencies with no symlinks..."
+    npm install --prefix client --no-bin-links
+    npm install --prefix server --no-bin-links
+
+    echo "Building frontend..."
     npm run build:frontend
-    echo Building backend...
+    echo "Building backend..."
     npm run build:backend
   displayName: 'Install and Build Frontend and Backend'
 
