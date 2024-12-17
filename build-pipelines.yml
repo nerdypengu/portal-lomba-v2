@@ -17,10 +17,18 @@ steps:
     versionSpec: '20.x' # Change to match your project requirements
   displayName: 'Install Node.js'
 
+# Install BuildX
+- script: |
+    echo Setting up Docker Buildx...
+    docker run --privileged --rm tonistiigi/binfmt --install arm64,arm
+    docker buildx create --use
+    docker buildx ls
+  displayName: 'Install Docker Buildx'
+
 # Step 2: Install dependencies and build
 - script: |
     echo Installing dependencies...
-    npm install
+    npm ci --legacy-peer-deps
     echo Building frontend...
     npm run build:frontend
     echo Building backend...
