@@ -48,8 +48,8 @@ stages:
           SonarQube: 'SonarQube'
           scannerMode: 'cli'
           configMode: 'manual'
-          cliProjectKey: 'Portal-lomba'
-          cliProjectName: 'portal'
+          cliProjectKey: 'FP-PSO-11_FP-PSO-11_AZPKLNXakXt54pvTXdAs'
+          cliProjectName: 'portalomba'
           cliSources: '.'
 
       - task: SonarQubeAnalyze@7
