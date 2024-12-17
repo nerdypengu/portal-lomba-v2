@@ -67,7 +67,7 @@ steps:
     rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
     includeRootFolder: false
     archiveType: 'tar'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/$(uiName).tar.gz'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/portal-lomba.tar.gz'
     replaceExistingArchive: true
 
 - task: PublishBuildArtifacts@1
