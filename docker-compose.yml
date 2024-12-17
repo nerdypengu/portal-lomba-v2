@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  # Frontend Service
+  frontend:
+    build:
+      context: ./client  # Path ke direktori frontend
+      dockerfile: Dockerfile
+    image: portal-lomba:frontend-latest  # Nama dan tag image
+    ports:
+      - "80:80"  # Port frontend (nginx) di host
+    depends_on:
+      - backend  # Frontend bergantung pada backend untuk data API
+
+  # Backend Service
+  backend:
+    build:
+      context: ./server  # Path ke direktori backend
+      dockerfile: Dockerfile
+    image: portal-lomba:backend-latest  # Nama dan tag image
+    ports:
+      - "5000:5000"  # Port backend di host
+    environment:
+      - NODE_ENV=production
+      - PORT=5000  # Sesuai dengan server.js di backend
+    volumes:
+      - ./server:/app  # Volume lokal agar perubahan backend terlihat langsung
+      - /app/node_modules  # Hindari meng-overwrite node_modules

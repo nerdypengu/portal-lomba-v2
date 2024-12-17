@@ -1,0 +1,46 @@
+trigger: 
+- main
+
+pool:
+  name: devasc-mut
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '20.x'
+  displayName: 'Install Node.js'
+
+- task: Npm@1
+  inputs:
+    command: 'install'
+    workingDir: 'client'
+  displayName: 'Installing modules in /client'
+
+- task: Npm@1
+  inputs:
+    command: 'install'
+    workingDir: 'server'
+  displayName: 'Installing modules in /server'
+
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    workingDir: 'client'
+    customCommand: 'run build'
+  displayName: 'build frontend'
+
+- task: CopyFiles@2
+  inputs:
+    Contents: |
+      client/dist/**
+      server/**
+      startup.sh
+    TargetFolder: $(Build.ArtifactStagingDirectory)
+  displayName: 'Copy file as artifacts'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'portal-lomba'
+    publishLocation: 'Container'
+  displayName: 'Publish artifacts'

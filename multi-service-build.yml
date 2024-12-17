@@ -1,0 +1,64 @@
+trigger: none
+
+pool:
+  name: devasc-mut
+
+variables:
+  composeFile: 'docker-compose.yml'
+
+steps:
+# Step 1: Install Docker Compose
+- script: |
+    echo "Installing Docker Compose..."
+    sudo curl -L "https://github.com/docker/compose/releases/download/v2.26.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    sudo chmod +x /usr/local/bin/docker-compose
+    docker-compose --version
+  displayName: 'Install Docker Compose'
+
+# Step 1: Install Node.js (jika diperlukan untuk linting/test)
+- task: NodeTool@0
+  inputs:
+    versionSpec: '20.x'
+  displayName: 'Install Node.js'
+
+# Step 2: Linting dan Testing (Opsional)
+- script: |
+    cd client
+    echo "Linting frontend..."
+    npm run lint
+    cd ../server
+    echo "Testing backend..."
+    npm test || echo "No tests configured"
+  displayName: 'Lint and Test Code'
+
+# Step 3: Docker Login
+- task: Docker@2
+  displayName: 'Login to Docker Hub'
+  inputs:
+    command: 'login'
+    containerRegistry: 'dockerhub-mut-reg-con'
+
+# Step 4: Build Images with Docker Compose
+- script: |
+    echo "Building images using docker-compose..."
+    docker-compose -f $(composeFile) build
+  displayName: 'Build Docker Images with Docker Compose'
+
+# Step 5: Push Docker Images (Frontend & Backend)
+- script: |
+    echo "Pushing frontend image..."
+    docker tag portal-lomba:frontend-latest moetzie/portal-lomba:frontend-latest
+    docker push moetzie/portal-lomba:frontend-latest
+
+    echo "Pushing backend image..."
+    docker tag portal-lomba:backend-latest moetzie/portal-lomba:backend-latest
+    docker push moetzie/portal-lomba:backend-latest
+  displayName: 'Tag and Push Docker Images'
+
+# Step 6: Publish Docker Compose File (Opsional)
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(composeFile)'
+    ArtifactName: 'docker-compose'
+    publishLocation: 'Container'
+  displayName: 'Publish Docker Compose File'

@@ -1,0 +1,70 @@
+trigger: none
+#   branches:
+#     include:
+#       - main
+
+pool:
+  name: devasc-mut
+
+variables:
+  frontendBuildDir: 'client' # Adjust if the frontend build directory differs
+  backendBuildDir: 'server'       # Adjust if the backend build directory differs
+
+steps:
+# Step 1: Install Node.js
+- task: NodeTool@0
+  inputs:
+    versionSpec: '20.x' # Change to match your project requirements
+  displayName: 'Install Node.js'
+
+# Step 2: Install dependencies and build
+- script: |
+    echo Installing dependencies...
+    npm install
+    echo Building frontend...
+    npm run build:frontend
+    echo Building backend...
+    npm run build:backend
+  displayName: 'Install and Build Frontend and Backend'
+
+# Step 3: Copy artifacts to staging directory
+- script: |
+    echo Preparing artifacts for publishing...
+    mkdir -p $(Build.ArtifactStagingDirectory)/frontend
+    mkdir -p $(Build.ArtifactStagingDirectory)/backend
+    cp -R $(frontendBuildDir)/* $(Build.ArtifactStagingDirectory)/frontend
+    cp -R $(backendBuildDir)/* $(Build.ArtifactStagingDirectory)/backend
+  displayName: 'Copy Build Artifacts'
+
+# Step 4: Docker Login
+- task: Docker@2
+  displayName: 'Login to Docker Hub'
+  inputs:
+    command: 'login'
+    containerRegistry: 'dockerhub-mut-reg-con'
+
+# Step 5: Build and Push Docker Images (Frontend)
+- task: Docker@2
+  inputs:
+    containerRegistry: 'dockerhub-mut-reg-con'
+    repository: 'moetzie/portal-lomba'
+    command: 'buildAndPush'
+    Dockerfile: 'client/Dockerfile' # Path to client Dockerfile
+    tags: 'frontend-latest'
+
+# Step 6: Build and Push Docker Images (Backend)
+- task: Docker@2
+  inputs:
+    containerRegistry: 'dockerhub-mut-reg-con'
+    repository: 'moetzie/portal-lomba'
+    command: 'buildAndPush'
+    Dockerfile: 'server/Dockerfile' # Path to server Dockerfile
+    tags: 'backend-latest'
+
+# Step 7: Publish Build Artifacts
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+  displayName: 'Publish Build Artifacts'

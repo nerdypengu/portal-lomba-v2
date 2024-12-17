@@ -5,7 +5,9 @@
     "install": "npm install --prefix client && npm install --prefix server",
     "start": "concurrently \"npm run start-client\" \"npm run start-server\"",
     "start-client": "npm --prefix client run dev",
-    "start-server": "node server/server.js"
+    "start-server": "node server/server.js",
+    "build:frontend": "npm --prefix client run build",
+    "build:backend": "echo \"No build step for backend. Skipping.\""
   },
   "devDependencies": {
     "concurrently": "^9.1.0"
