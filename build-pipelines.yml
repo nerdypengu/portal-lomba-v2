@@ -4,7 +4,7 @@ trigger: none
 #       - main
 
 pool:
-  name: devasc-mut
+  name: devasc-karina
 
 variables:
   frontendBuildDir: 'client' # Adjust if the frontend build directory differs
@@ -35,6 +35,14 @@ steps:
     cp -R $(frontendBuildDir)/* $(Build.ArtifactStagingDirectory)/frontend
     cp -R $(backendBuildDir)/* $(Build.ArtifactStagingDirectory)/backend
   displayName: 'Copy Build Artifacts'
+
+# Step 8: Run test for Frontend
+- script: |
+    echo Running tests for frontend...
+    cd $(frontendBuildDir)
+    npm install
+    npm run test
+  displayName: 'Run Frontend Tests'
 
 # Step 4: Docker Login
 - task: Docker@2
