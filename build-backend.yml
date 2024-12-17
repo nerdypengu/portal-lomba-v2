@@ -1,5 +1,5 @@
-trigger:
-- main
+trigger: none
+# - main
 
 pool:
   name: devasc-mut
@@ -34,6 +34,7 @@ steps:
     Contents: |
       client/dist/**
       server/**
+      startup.sh
     TargetFolder: $(Build.ArtifactStagingDirectory)
   displayName: 'Copy file as artifacts'
 
