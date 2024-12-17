@@ -4,7 +4,7 @@ trigger: none
 #       - main
 
 pool:
-  name: devasc-mut
+  name: karina
 
 variables:
   frontendBuildDir: 'client' # Adjust if the frontend build directory differs
@@ -76,3 +76,9 @@ steps:
     ArtifactName: 'drop'
     publishLocation: 'Container'
   displayName: 'Publish Build Artifacts'
+  
+  # Step 8: run test
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    customCommand: 'run test'
