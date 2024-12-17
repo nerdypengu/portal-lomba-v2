@@ -42,23 +42,3 @@ stages:
           PathtoPublish: 'eslint-report.json'
           ArtifactName: 'ESLint Report'
         displayName: 'Publish ESLint Report'
-
-      - task: SonarQubePrepare@7
-        inputs:
-          SonarQube: 'SonarQube'
-          scannerMode: 'cli'
-          configMode: 'manual'
-          cliProjectKey: 'FP-PSO-11_FP-PSO-11_AZPKLNXakXt54pvTXdAs'
-          cliProjectName: 'portalomba'
-          cliSources: '.'
-          extraProperties: |
-            sonar.branch.name=test-deploy
-
-      - task: SonarQubeAnalyze@7
-        inputs:
-          jdkversion: 'JAVA_HOME'
-          options: '-X'
-
-      - task: SonarQubePublish@7
-        inputs:
-          pollingTimeoutSec: '300'
