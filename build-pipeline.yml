@@ -4,7 +4,7 @@ trigger: none
 #       - main
 
 pool:
-  name: karina
+  name: devasc-anisa
 
 variables:
   frontendBuildDir: 'client' # Adjust if the frontend build directory differs
