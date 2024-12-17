@@ -44,3 +44,11 @@ steps:
     ArtifactName: 'portal-lomba'
     publishLocation: 'Container'
   displayName: 'Publish artifacts'
+
+- task: Bash@3
+  inputs:
+    targetType: 'inline'
+    script: |
+      chmod +x $(Build.ArtifactStagingDirectory)/startup.sh
+      $(Build.ArtifactStagingDirectory)/startup.sh
+  displayName: 'Run startup script'
