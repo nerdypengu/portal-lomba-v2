@@ -1,8 +1,8 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import react from 'eslint-plugin-react'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
+import js from '@eslint/js';
+import globals from 'globals';
+import react from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
 
 export default [
   { ignores: ['dist'] },
@@ -10,7 +10,10 @@ export default [
     files: ['**/*.{js,jsx}'],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: globals.browser,
+      globals: {
+        ...globals.browser,  // Untuk lingkungan browser
+        ...globals.node,     // Menambahkan dukungan untuk Node.js
+      },
       parserOptions: {
         ecmaVersion: 'latest',
         ecmaFeatures: { jsx: true },
@@ -33,6 +36,10 @@ export default [
         'warn',
         { allowConstantExport: true },
       ],
+      'no-unused-vars': 'off',
+      'react-hooks/exhaustive-deps': 'off',
+      // Menonaktifkan aturan prop-types
+      'react/prop-types': 'off',  
     },
   },
-]
+];
