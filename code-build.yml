@@ -51,6 +51,8 @@ stages:
           cliProjectKey: 'FP-PSO-11_FP-PSO-11_AZPKLNXakXt54pvTXdAs'
           cliProjectName: 'portalomba'
           cliSources: '.'
+          extraProperties: |
+            sonar.branch.name=test-deploy
 
       - task: SonarQubeAnalyze@7
         inputs:
