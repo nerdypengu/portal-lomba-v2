@@ -10,26 +10,23 @@ const {Readable} = require("stream");
 const cors = require('cors');
 
 // Load environment variables
-dotenv.config();
+require('dotenv').config();
 
 const app = express();
 app.use(express.json());
-app.use(cookieParser()); // For cookie parsing
+app.use(cookieParser());
 app.use(cors({
   origin: "http://localhost:5173",
   methods: ["GET", "POST","DELETE","PUT"],
   credentials: true,
 }));
 
-// Import the authorization middleware from cookieAuth.js
-const { authorization } = require("./cookieAuth"); // Import the authorization middleware
+const { authorization } = require("./cookieAuth");
 
-// Set up file upload configuration
 const upload = multer({
   storage: multer.memoryStorage(),
 });
 
-// Set up Google Sheets API authentication
 const credentialsPath = path.join(__dirname, "credentials.json");
 const auth = new google.auth.GoogleAuth({
   keyFile: credentialsPath,
@@ -42,17 +39,15 @@ const auth = new google.auth.GoogleAuth({
 const sheets = google.sheets({ version: "v4", auth });
 const drive = google.drive({version : "v3", auth});
 
-// Define constants
-const SPREADSHEET_ID = "1gpJ7LHMC9vOH8ArfEsO8ixS-y77PKY-M921jGIYjopg"; // Replace with your Google Sheet ID
-const AUTH_SHEET_NAME = "AUTH"; // Sheet containing emails and hashed passwords
-const SECRET_KEY = process.env.JWT_KEY || "PSOFP11"; // JWT secret from environment variable
+const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
+const AUTH_SHEET_NAME = process.env.AUTH_SHEET_NAME;
+const SECRET_KEY = process.env.JWT_KEY ;
 
-// Helper function to fetch a user by email from Google Sheets
 async function fetchUser(email) {
   try {
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: `${AUTH_SHEET_NAME}!A:B`, // Column A: Emails, Column B: SHA-256 Hashed Passwords
+      range: `${AUTH_SHEET_NAME}!A:B`,
     });
 
     const rows = response.data.values || [];
@@ -94,8 +89,8 @@ app.post("/api/login", async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Make sure it's true in production
-      sameSite: "Strict", // Ensure the cookie is sent with requests
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
     });
 
     return res.status(200).json({ message: "Login successful" });
@@ -241,7 +236,7 @@ app.post("/api/competitions", authorization, upload.single("image"), async (req,
     desc,
   } = req.body;
 
-  const sheetId = "1gpJ7LHMC9vOH8ArfEsO8ixS-y77PKY-M921jGIYjopg";
+  const sheetId = SPREADSHEET_ID;
   const sheetName = "Januari";
 
   if (
@@ -294,10 +289,8 @@ async function getAllSheetNames(sheetId) {
 }
 
 
-
-// Fetch all competitions from all sheets
 app.get("/api/competitions/all", async (req, res) => {
-  const sheetId = "1gpJ7LHMC9vOH8ArfEsO8ixS-y77PKY-M921jGIYjopg";
+  const sheetId = SPREADSHEET_ID;
 
   if (!sheetId) {
     return res.status(400).send("Missing required parameter: sheetId.");
@@ -351,7 +344,7 @@ app.get("/api/competitions/all", async (req, res) => {
 
 app.get("/api/competitions/:sheetName/:id", async (req, res) => {
   const { sheetName, id } = req.params;
-  const sheetId = "1gpJ7LHMC9vOH8ArfEsO8ixS-y77PKY-M921jGIYjopg";
+  const sheetId = SPREADSHEET_ID;
 
   if (!id || !sheetName) {
     return res.status(400).json({ error: "Missing required parameters: id and sheetName." });
@@ -362,7 +355,6 @@ app.get("/api/competitions/:sheetName/:id", async (req, res) => {
   }
 
   try {
-    // Check if the sheetName exists in the spreadsheet
     const sheetNames = await getAllSheetNames(sheetId);
     if (!sheetNames.includes(sheetName)) {
       return res.status(404).json({ error: `Sheet with name ${sheetName} not found.` });
@@ -370,7 +362,7 @@ app.get("/api/competitions/:sheetName/:id", async (req, res) => {
 
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: `${sheetName}!A:K`, // Query the specific sheet
+      range: `${sheetName}!A:K`,
     });
 
     const rows = response.data.values || [];
@@ -407,14 +399,10 @@ app.get("/api/competitions/:sheetName/:id", async (req, res) => {
 });
 
 
-
-
-
-//Update Competition Data
 app.put("/api/competitions/:sheetName/:id", upload.single("image"), async (req, res) => {
   const { sheetName, id } = req.params;
   const { name, startRegistDate, endRegistDate, tags, desc } = req.body;
-  const sheetId = "1gpJ7LHMC9vOH8ArfEsO8ixS-y77PKY-M921jGIYjopg"; 
+  const sheetId = SPREADSHEET_ID;
 
   if (!sheetId || !sheetName || !id) {
     return res.status(400).send("Missing required fields (sheetId, sheetName, id).");
@@ -517,7 +505,7 @@ async function deleteOldImage(imageId) {
 // DELETE COMPETITION
 app.delete("/api/competitions/:sheetName/:id", async (req, res) => {
   const { sheetName, id } = req.params;
-  const sheetId = "1gpJ7LHMC9vOH8ArfEsO8ixS-y77PKY-M921jGIYjopg"; 
+  const sheetId = SPREADSHEET_ID;
 
   if (!sheetId || !sheetName || !id) {
     return res.status(400).send("Missing required fields (sheetId, sheetName, id).");
@@ -588,9 +576,9 @@ app.delete("/api/competitions/:sheetName/:id", async (req, res) => {
   }
 });
 
-// app.listen(8080, () => {
-//   console.log("Server started on port 8080");
-// });
+app.listen(8080, () => {
+  console.log("Server started on port 8080");
+});
 
 app.get("/", async (req, res) => {
   res.status(200).json({ message: "Server is running" });

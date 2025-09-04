@@ -4,15 +4,10 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "jest --ci --coverage", 
-    "lint": "eslint .", 
-    "jest": {
-              "collectCoverage": true,
-              "coverageReporters": ["cobertura", "html"],
-              "coverageDirectory": "coverage"
-              },
+    "test": "jest --ci --coverage",
+    "lint": "eslint .",
     "start": "node server.js",
-    "dev": "env-cmd -f .env.development nodemon server.js"
+    "dev": "env-cmd -f .env nodemon server.js"
   },
   "keywords": [],
   "author": "",
@@ -21,7 +16,7 @@
     "body-parser": "^1.20.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
+    "dotenv": "^16.6.1",
     "express": "^4.21.1",
     "googleapis": "^144.0.0",
     "jsonwebtoken": "^9.0.2",
