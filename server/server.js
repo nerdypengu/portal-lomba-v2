@@ -16,7 +16,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: process.env.CLIENT_URL,
   methods: ["GET", "POST","DELETE","PUT"],
   credentials: true,
 }));
@@ -27,7 +27,13 @@ const upload = multer({
   storage: multer.memoryStorage(),
 });
 
-const credentialsPath = path.join(__dirname, "credentials.json");
+// Load environment variables
+const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
+const AUTH_SHEET_NAME = process.env.AUTH_SHEET_NAME;
+const SECRET_KEY = process.env.JWT_KEY;
+const CREDENTIALS_PATH = process.env.GOOGLE_CREDENTIALS_PATH;
+
+const credentialsPath = path.join(__dirname, CREDENTIALS_PATH);
 const auth = new google.auth.GoogleAuth({
   keyFile: credentialsPath,
   scopes: [
@@ -38,10 +44,6 @@ const auth = new google.auth.GoogleAuth({
 
 const sheets = google.sheets({ version: "v4", auth });
 const drive = google.drive({version : "v3", auth});
-
-const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
-const AUTH_SHEET_NAME = process.env.AUTH_SHEET_NAME;
-const SECRET_KEY = process.env.JWT_KEY ;
 
 async function fetchUser(email) {
   try {
@@ -85,7 +87,7 @@ app.post("/api/login", async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    const token = jwt.sign({ email: user.email }, SECRET_KEY, { expiresIn: "1h" });
+    const token = jwt.sign({ email: user.email }, SECRET_KEY, { expiresIn: process.env.JWT_EXPIRES_IN });
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -237,7 +239,7 @@ app.post("/api/competitions", authorization, upload.single("image"), async (req,
   } = req.body;
 
   const sheetId = SPREADSHEET_ID;
-  const sheetName = "Januari";
+  const sheetName = process.env.DEFAULT_SHEET_NAME;
 
   if (
     !sheetId ||
@@ -576,8 +578,9 @@ app.delete("/api/competitions/:sheetName/:id", async (req, res) => {
   }
 });
 
-app.listen(8080, () => {
-  console.log("Server started on port 8080");
+const PORT = process.env.PORT;
+app.listen(PORT, () => {
+  console.log(`Server started on port ${PORT}`);
 });
 
 app.get("/", async (req, res) => {
