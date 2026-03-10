@@ -137,7 +137,7 @@ const HomePage = () => {
                 </span>
               </h1>
               <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-                Join Indonesia's premier information systems community. Participate in world-class competitions, develop cutting-edge skills, and build lasting professional networks.
+                Join Indonesia&apos;s premier information systems community. Participate in world-class competitions, develop cutting-edge skills, and build lasting professional networks.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <a href="#competitions" className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-all transform hover:scale-105">
@@ -366,7 +366,7 @@ const HomePage = () => {
               <div className="text-6xl mb-4">🔍</div>
               <h3 className="text-2xl font-bold text-slate-900 mb-3">No competitions found</h3>
               <p className="text-gray-600 text-lg">
-                We couldn't find any competitions matching "{searchTerm}". Try adjusting your search.
+                We couldn&apos;t find any competitions matching &quot;{searchTerm}&quot;. Try adjusting your search.
               </p>
             </div>
           )}

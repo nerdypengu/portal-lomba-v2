@@ -39,7 +39,7 @@ const CompetitionDetails = () => {
     };
 
     fetchCompetitionDetails();
-  }, [id, sheetName]);
+  }, [id, sheetName, API_URL]);
 
   if (loading) {
     return (
