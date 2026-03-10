@@ -12,9 +12,8 @@ on:
       - 'client/**'
 
 jobs:
-  test-build-deploy:
+  test:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event_name == 'pull_request'
     
     steps:
       - name: Checkout code
@@ -45,22 +44,58 @@ jobs:
           files: ./client/coverage/lcov.info
           flags: frontend
           name: frontend-coverage
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'client/package-lock.json'
+      
+      - name: Install dependencies
+        working-directory: client
+        run: npm install
       
       - name: Build application
         working-directory: client
         run: npm run build
       
-      - name: Cleanup build artifacts
-        working-directory: client
-        run: rm -rf node_modules coverage
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: client/dist/
+          retention-days: 1
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: client/dist/
       
       - name: Deploy to Vercel
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
         working-directory: client
         run: |
           npm install -g vercel
-          vercel deploy \
+          vercel \
             --token ${{ secrets.VERCEL_TOKEN }} \
             --scope ${{ secrets.VERCEL_ORG_ID }} \
-            --project-id ${{ secrets.VERCEL_PROJECT_ID }} \
+            --project ${{ secrets.VERCEL_PROJECT_ID }} \
             $( [ "${{ github.ref }}" = "refs/heads/main" ] && echo "--prod" || echo "" )
