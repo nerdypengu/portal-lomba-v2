@@ -59,9 +59,9 @@ jobs:
         env:
           PUBLISH_USERNAME: ${{ secrets.PUBLISH_USERNAME }}
           PUBLISH_PASSWORD: ${{ secrets.PUBLISH_PASSWORD }}
-          WEB_APP_NAME: "portal-lomba-api" 
+          AZURE_DEPLOY_URL: ${{ secrets.AZURE_DEPLOY_URL }}
         run: |
           echo "Deploying ZIP to Azure via Kudu REST API..."
           curl -X POST -u "$PUBLISH_USERNAME:$PUBLISH_PASSWORD" \
           --data-binary @"${{ github.workspace }}/backend-release.zip" \
-          "https://$WEB_APP_NAME.scm.azurewebsites.net/api/zipdeploy"
+          "$AZURE_DEPLOY_URL"
