@@ -23,6 +23,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 1. Scans for hardcoded secrets
       - name: Gitleaks Secret Scanner
         uses: gitleaks/gitleaks-action@v2
         env:
@@ -40,6 +41,7 @@ jobs:
         working-directory: server
         run: npm install
         
+      # 2. Google's Vulnerability Scanner
       - name: Run OSV-Scanner
         working-directory: server
         run: |
@@ -55,13 +57,33 @@ jobs:
           npm run test
         continue-on-error: true
 
+      # 3. Create the credentials for Google Sheets
       - name: Create credentials.json
         working-directory: server
         run: |
           cat << 'EOF' > credentials.json
           ${{ secrets.GCP_CREDENTIALS_JSON }}
           EOF
-          
+
+      # 4. ZIP the backend (The reliable method)
+      - name: Zip Backend
+        working-directory: server
+        run: zip -r ${{ github.workspace }}/backend-release.zip . -x "*.git*"
+
+      # 5. Deploy to Azure App Service
+      - name: Deploy to Azure App Service
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          PUBLISH_USERNAME: ${{ secrets.PUBLISH_USERNAME }}
+          PUBLISH_PASSWORD: ${{ secrets.PUBLISH_PASSWORD }}
+          AZURE_DEPLOY_URL: ${{ secrets.AZURE_DEPLOY_URL }}
+        run: |
+          echo "Deploying ZIP to Azure via Kudu REST API..."
+          curl -X POST -u "$PUBLISH_USERNAME:$PUBLISH_PASSWORD" \
+          --data-binary @"${{ github.workspace }}/backend-release.zip" \
+          "$AZURE_DEPLOY_URL"
+
+      # 6. OPTIONAL: Docker Build (Just to keep it in your Packages for the thesis)
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:

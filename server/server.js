@@ -1,15 +1,13 @@
-const express = require("express");
+ const express = require("express");
 const multer = require("multer");
 const { google } = require("googleapis");
 const path = require("path");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
-const dotenv = require("dotenv");
 const crypto = require("crypto");
 const {Readable} = require("stream");
 const cors = require('cors');
 
-// Load environment variables
 require('dotenv').config();
 
 const app = express();
@@ -368,6 +366,7 @@ app.get("/api/competitions/:sheetName/:id", async (req, res) => {
     });
 
     const rows = response.data.values || [];
+     
     const headers = rows[0];
     const data = rows.slice(1);
 
@@ -417,6 +416,7 @@ app.put("/api/competitions/:sheetName/:id", upload.single("image"), async (req, 
     });
 
     const rows = response.data.values || [];
+    // eslint-disable-next-line no-unused-vars
     const headers = rows[0];
     const data = rows.slice(1);
 

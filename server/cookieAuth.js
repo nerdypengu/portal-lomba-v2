@@ -19,7 +19,7 @@ const authorization = (req, res, next) => {
     req.userRole = data.role;  // Assuming JWT contains role
     
     return next();  // Proceed to the next middleware or route handler
-  } catch (error) {
+  } catch {
     return res.sendStatus(403);  // Token is invalid, send Forbidden response
   }
 };
