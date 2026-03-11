@@ -50,21 +50,18 @@ jobs:
           ${{ secrets.GCP_CREDENTIALS_JSON }}
           EOF
 
-      # Zips the entire server folder (excluding git files)
       - name: Zip Backend
         working-directory: server
-        run: zip -r ../backend-release.zip . -x "*.git*"
+        run: zip -r ${{ github.workspace }}/backend-release.zip . -x "*.git*"
 
-      # Deploys to Azure ONLY if it's a push to the main branch
       - name: Deploy to Azure App Service
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           PUBLISH_USERNAME: ${{ secrets.PUBLISH_USERNAME }}
           PUBLISH_PASSWORD: ${{ secrets.PUBLISH_PASSWORD }}
-          # CHANGE THIS if your app name is different!
           WEB_APP_NAME: "portal-lomba-api" 
         run: |
           echo "Deploying ZIP to Azure via Kudu REST API..."
           curl -X POST -u "$PUBLISH_USERNAME:$PUBLISH_PASSWORD" \
-          --data-binary @"../backend-release.zip" \
+          --data-binary @"${{ github.workspace }}/backend-release.zip" \
           "https://$WEB_APP_NAME.scm.azurewebsites.net/api/zipdeploy"
