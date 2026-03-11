@@ -16,6 +16,8 @@ const CompetitionsManagement = () => {
   });
   const [searchQuery, setSearchQuery] = useState("");
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   // Mapping function: Response keys -> Modal keys
   const mapResponseToModalData = (responseData) => ({
     id: responseData.Id,
@@ -42,7 +44,7 @@ const CompetitionsManagement = () => {
 
   const fetchCompetitions = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/competitions/all");
+      const response = await fetch(`${API_URL}/api/competitions/all`);
       const result = await response.json();
   
       if (response.ok) {
@@ -73,7 +75,7 @@ const CompetitionsManagement = () => {
       }
   
       // Add credentials: "include" to send cookies with the request
-      const response = await fetch("http://localhost:8080/api/competitions", {
+      const response = await fetch(`${API_URL}/api/competitions`, {
         method: "POST",
         body: formData,
         credentials: "include", // This ensures the JWT cookie is included with the request
@@ -104,7 +106,7 @@ const CompetitionsManagement = () => {
       const payload = mapModalDataToRequestPayload(modal.data);
 
       const response = await fetch(
-        `http://localhost:8080/api/competitions/${modal.data.month}/${modal.data.id}`,
+        `${API_URL}/api/competitions/${modal.data.month}/${modal.data.id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -126,7 +128,7 @@ const CompetitionsManagement = () => {
   const handleDelete = async (id,month) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/competitions/${month}/${id}`,
+        `${API_URL}/api/competitions/${month}/${id}`,
         {
           method: "DELETE",
         }

@@ -5,10 +5,12 @@ import { useState, useEffect } from "react";
 const DashboardOverview = () => {
   const [competitionCount, setCompetitionCount] = useState(0);
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     const fetchCompetitionsCount = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/competitions?year=2024");
+        const response = await fetch(`${API_URL}/api/competitions?year=2024`);
         const result = await response.json();
 
         if (response.ok) {

@@ -11,12 +11,14 @@ const LoginPage = () => {
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const navigate = useNavigate(); // Initialize the navigate function from react-router
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const handleLogin = async () => {
     setError(null);
     setShowErrorNotification(false);
 
     try {
-      const response = await fetch("http://localhost:8080/api/login", {
+      const response = await fetch(`${API_URL}/api/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
