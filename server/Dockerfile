@@ -1,16 +1,13 @@
-# Step 1: Base image
-FROM node:20-alpine
+FROM node:22-alpine
 
-# Step 2: Set working directory
 WORKDIR /app
 
-# Step 3: Copy package.json and install dependencies
-COPY package.json package-lock.json ./
-RUN npm install
+COPY package*.json ./
 
-# Step 4: Copy application code
+RUN npm ci --only=production
+
 COPY . .
 
-# Step 5: Expose the required port and run the server
 EXPOSE 8080
-CMD ["node", "server.js"]
+
+CMD ["node", "index.js"]
