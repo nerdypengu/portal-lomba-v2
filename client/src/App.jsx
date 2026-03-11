@@ -1,7 +1,7 @@
 "use client";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Analytics } from "@vercel/analytics/next";
+import { Analytics } from "@vercel/analytics/react";
 import HomePage from "./HomePage";
 import CompetitionDetails from "./CompetitionDetails";
 import LoginPage from "./LoginPage";
