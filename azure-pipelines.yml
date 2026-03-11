@@ -7,36 +7,19 @@ trigger:
     include:
       - server/**
       - azure-pipelines.yml
-      - docker-compose.yml
-
-pr:
-  branches:
-    include:
-      - main
-      - develop
-  paths:
-    include:
-      - server/**
-      - azure-pipelines.yml
 
 pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  dockerRegistryServiceConnection: 'AzureContainerRegistry'
-  imageRepository: 'portal-lomba'
-  containerRegistry: '$(REGISTRY_NAME).azurecr.io'
-  dockerfilePath: 'server/Dockerfile'
-  tag: '$(Build.BuildId)'
-  imageName: '$(containerRegistry)/$(imageRepository):$(tag)'
-  imageNameLatest: '$(containerRegistry)/$(imageRepository):latest'
+  webAppName: 'portal-lomba-api'
 
 stages:
-  - stage: Test
-    displayName: 'Test Stage'
+  - stage: Build
+    displayName: 'Test and Build Stage'
     jobs:
-      - job: UnitTests
-        displayName: 'Run Unit Tests'
+      - job: BuildJob
+        displayName: 'Test and Zip Code'
         steps:
           - checkout: self
           
@@ -44,89 +27,65 @@ stages:
             inputs:
               versionSpec: '20.x'
             displayName: 'Install Node.js'
-          
+            
           - script: |
               cd server
               npm install
             displayName: 'Install Dependencies'
-          
+
+          - script: |
+              cd server
+              npm audit --audit-level=high
+            displayName: 'Security Scan (npm audit)'
+            continueOnError: true
+            
           - script: |
               cd server
               npm run lint
-            displayName: 'Run Linter'
-            continueOnError: true
-          
-          - script: |
-              cd server
               npm run test
-            displayName: 'Run Tests'
-          
-          - task: PublishCodeCoverageResults@1
-            inputs:
-              codeCoverageTool: cobertura
-              summaryFileLocation: 'server/coverage/cobertura-coverage.xml'
-              reportDirectory: 'server/coverage'
-            displayName: 'Publish Coverage Reports'
-            condition: always()
+            displayName: 'Lint and Test'
+            continueOnError: true
 
-  - stage: Build
-    displayName: 'Build Stage'
-    dependsOn: Test
-    condition: succeeded()
-    jobs:
-      - job: BuildImage
-        displayName: 'Build Docker Image'
-        steps:
-          - checkout: self
-          
-          - task: Docker@2
-            displayName: 'Build Docker Image'
+          - task: DownloadSecureFile@1
+            name: gcpCredentials
+            displayName: 'Download Google Sheets Credentials'
             inputs:
-              command: build
-              Dockerfile: '$(dockerfilePath)'
-              tags: |
-                $(imageName)
-                $(imageNameLatest)
-              arguments: '--build-arg BUILD_NUMBER=$(Build.BuildId)'
+              secureFile: 'credentials.json'
 
-  - stage: Push
-    displayName: 'Push Stage'
-    dependsOn: Build
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), ne(variables['Build.Reason'], 'PullRequest'))
-    jobs:
-      - job: PushImage
-        displayName: 'Push Image to ACR'
-        steps:
-          - checkout: self
-          
-          - task: Docker@2
-            displayName: 'Build and Push Image'
+          - script: |
+              cp $(gcpCredentials.secureFilePath) $(System.DefaultWorkingDirectory)/server/credentials.json
+            displayName: 'Place credentials.json in server directory'
+
+          - task: ArchiveFiles@2
+            displayName: 'Zip Express Backend'
             inputs:
-              command: buildAndPush
-              repository: '$(imageRepository)'
-              dockerfile: '$(dockerfilePath)'
-              containerRegistry: '$(dockerRegistryServiceConnection)'
-              tags: |
-                $(tag)
-                latest
+              rootFolderOrFile: '$(System.DefaultWorkingDirectory)/server'
+              includeRootFolder: false
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+              replaceExistingArchive: true
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Zip Artifact'
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+              ArtifactName: 'drop'
 
   - stage: Deploy
     displayName: 'Deploy Stage'
-    dependsOn: Push
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), ne(variables['Build.Reason'], 'PullRequest'))
+    dependsOn: Build
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
     jobs:
       - deployment: DeployToAzure
-        displayName: 'Deploy to Azure Container Instances'
+        displayName: 'Deploy to Azure App Service'
         environment: 'Production'
         strategy:
           runOnce:
             deploy:
               steps:
-                - task: AzureWebAppContainer@1
-                  displayName: 'Deploy Web App Container'
-                  inputs:
-                    azureSubscription: '$(AZURE_SUBSCRIPTION)'
-                    appName: '$(AZURE_APP_NAME)'
-                    imageName: '$(imageNameLatest)'
-                    containers: |
-                      $(containerRegistry)/$(imageRepository):latest
+                - bash: |
+                    echo "Deploying ZIP to Azure via Kudu REST API..."
+                    curl -X POST -u "$(PUBLISH_USERNAME):$(PUBLISH_PASSWORD)" \
+                    --data-binary @"$(Pipeline.Workspace)/drop/$(Build.BuildId).zip" \
+                    "https://$(webAppName).scm.azurewebsites.net/api/zipdeploy"
+                  displayName: 'Deploy Code via Publish Profile'
